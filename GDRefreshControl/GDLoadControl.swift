@@ -134,7 +134,7 @@ public class GDLoadControl: UIControl {
         self.titleLabel.numberOfLines = 0
     }
     
-    convenience  init(target: AnyObject? , selector : Selector?) {
+    public convenience  init(target: AnyObject? , selector : Selector?) {
         self.init(frame: CGRect.zero)
         self.loadTarget = target
         self.loadAction = selector

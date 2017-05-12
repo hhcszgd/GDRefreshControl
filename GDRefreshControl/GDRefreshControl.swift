@@ -145,7 +145,7 @@ public class GDRefreshControl: UIControl {
         self.titleLabel.numberOfLines = 0
     }
     
-    convenience  init(target: AnyObject? , selector : Selector?) {
+    public convenience  init(target: AnyObject? , selector : Selector?) {
         self.init(frame: CGRect.zero)
         self.refreshTarget = target
         self.refreshAction = selector
