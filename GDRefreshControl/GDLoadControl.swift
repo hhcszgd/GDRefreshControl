@@ -10,7 +10,7 @@
 import UIKit
 
 // MARK: 注释 : 加载结果
-enum GDLoadResult {
+public enum GDLoadResult {
     case success
     case failure
     case networkError
@@ -32,14 +32,14 @@ enum GDLoadShowStatus {
     
 }
 // MARK: 注释 :  加载控件当前状态
-enum GDLoadStatus {
+public enum GDLoadStatus {
     case idle
     case pulling
     case loading
     case backing
 }
 
-class GDLoadControl: UIControl {
+public class GDLoadControl: UIControl {
     lazy var titleLabel = UILabel()
     lazy var imageView  = UIImageView()
     var loadHeight : CGFloat = 60
@@ -668,7 +668,7 @@ extension GDLoadControl : UIScrollViewDelegate{
 
 
 
-extension UIScrollView{
+public extension UIScrollView{
     static var gdLoadControl: Void?
     /** 加载控件 */
     @IBInspectable var gdLoadControl: GDLoadControl? {

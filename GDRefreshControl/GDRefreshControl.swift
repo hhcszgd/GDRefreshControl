@@ -9,7 +9,7 @@
 import UIKit
 
 // MARK: 注释 : 加载结果
-enum GDRefreshResult {
+public enum GDRefreshResult {
     case success
     case failure
     case networkError
@@ -36,20 +36,20 @@ enum GDShowStatus {
     
 }
 // MARK: 注释 : 刷新控件当前状态
-enum GDRefreshStatus {
+public enum GDRefreshStatus {
     case idle
     case pulling
     case refreshing
     case backing
 }
 // MARK: 注释 : 刷新控件的方向
-enum GDDirection {
+public enum GDDirection {
     case top
     case left
     case bottom
     case right
 }
-class GDRefreshControl: UIControl {
+public class GDRefreshControl: UIControl {
     lazy var titleLabel = UILabel()
     lazy var imageView  = UIImageView()
     var refreshHeight : CGFloat = 100
@@ -690,7 +690,7 @@ extension GDRefreshControl : UIScrollViewDelegate{
 
 
 
-extension UIScrollView{
+public extension UIScrollView{
     static var gdRefreshControl: Void?
     /** 刷新控件 */
     @IBInspectable var gdRefreshControl: GDRefreshControl? {
