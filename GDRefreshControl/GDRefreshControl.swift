@@ -52,7 +52,7 @@ public enum GDDirection {
 public class GDRefreshControl: UIControl {
     lazy var titleLabel = UILabel()
     lazy var imageView  = UIImageView()
-    var refreshHeight : CGFloat = 100
+    public var refreshHeight : CGFloat = 100
     
     
     fileprivate var originalIspagingEnable = false
@@ -64,13 +64,13 @@ public class GDRefreshControl: UIControl {
 //    var refreshType  = GDRefreshType.auto
     
     
-    var direction : GDDirection = GDDirection.top
+    public var direction : GDDirection = GDDirection.top
     fileprivate var scrollView : UIScrollView?
     
     fileprivate weak var refreshTarget : AnyObject?
     fileprivate var refreshAction : Selector?
     
-    var refreshStatus = GDRefreshStatus.idle{
+    public var refreshStatus = GDRefreshStatus.idle{
         
         didSet{
             if refreshStatus != GDRefreshStatus.refreshing {    return  }
@@ -186,7 +186,7 @@ extension GDRefreshControl {
         }
     }
     
-    func endRefresh(result : GDRefreshResult = GDRefreshResult.success)  {
+    public func endRefresh(result : GDRefreshResult = GDRefreshResult.success)  {
         var delay : TimeInterval = 1
 
         if  self.refreshStatus == GDRefreshStatus.refreshing {

@@ -42,7 +42,7 @@ public enum GDLoadStatus {
 public class GDLoadControl: UIControl {
     lazy var titleLabel = UILabel()
     lazy var imageView  = UIImageView()
-    var loadHeight : CGFloat = 60
+    public var loadHeight : CGFloat = 60
     
     
     fileprivate var originalIspagingEnable = false
@@ -53,13 +53,13 @@ public class GDLoadControl: UIControl {
     fileprivate var showStatus = GDLoadShowStatus.idle
     
     
-    var direction : GDDirection = GDDirection.bottom
+    public var direction : GDDirection = GDDirection.bottom
     fileprivate var scrollView : UIScrollView?
     
     fileprivate weak var loadTarget : AnyObject?
     fileprivate var loadAction : Selector?
     
-    var loadStatus = GDLoadStatus.idle{
+    public var loadStatus = GDLoadStatus.idle{
         
         didSet{
             if loadStatus != GDLoadStatus.loading {    return  }
@@ -173,7 +173,7 @@ extension GDLoadControl {
         }
     }
     
-    func endLoad(result : GDLoadResult = GDLoadResult.success)  {
+    public func endLoad(result : GDLoadResult = GDLoadResult.success)  {
         var delay : TimeInterval = 1
         
         if  self.loadStatus == GDLoadStatus.loading {
