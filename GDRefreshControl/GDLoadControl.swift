@@ -140,7 +140,7 @@ public class GDLoadControl: UIControl {
         self.loadAction = selector
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -293,7 +293,7 @@ extension GDLoadControl {
     
     
     
-    override func willMove(toSuperview newSuperview: UIView?) {//important
+    override public func willMove(toSuperview newSuperview: UIView?) {//important
         super.willMove(toSuperview: newSuperview)
         if newSuperview == nil  {//将要从tableView上移除之前(提前与deinit),先移除scrollView的contentOffset的监听 , 否则会崩溃
             //            if let scrollView = self.superview as? UIScrollView {
@@ -313,7 +313,7 @@ extension GDLoadControl {
         }
     }
     
-    override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         if let scrollView = self.scrollView {
             self.scrollView = scrollView
@@ -343,7 +343,7 @@ extension GDLoadControl {
         }
     }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
         if keyPath != nil && keyPath! == "contentOffset" {
 //            if let newPoint = change?[NSKeyValueChangeKey.newKey] as? CGPoint{
@@ -374,7 +374,7 @@ extension GDLoadControl : UIScrollViewDelegate{
         return nil
     }
     
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         if let refresh  = self.whetherCallRefreshDelegate(scrollView) {
             refresh.scrollViewWillBeginDragging(scrollView)
         }
@@ -544,7 +544,7 @@ extension GDLoadControl : UIScrollViewDelegate{
         }
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         //                mylog(newPoint)//下拉变小
         if let refresh  = self.whetherCallRefreshDelegate(scrollView) {
             refresh.scrollViewDidScroll(scrollView)

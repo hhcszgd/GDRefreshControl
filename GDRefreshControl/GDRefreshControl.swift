@@ -151,7 +151,7 @@ public class GDRefreshControl: UIControl {
         self.refreshAction = selector
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -301,7 +301,7 @@ extension GDRefreshControl {
     
     
     
-    override func willMove(toSuperview newSuperview: UIView?) {//important
+    override public func willMove(toSuperview newSuperview: UIView?) {//important
         super.willMove(toSuperview: newSuperview)
         if newSuperview == nil  {//将要从tableView上移除之前(提前与deinit),先移除scrollView的contentOffset的监听 , 否则会崩溃
 //            if let scrollView = self.superview as? UIScrollView {
@@ -321,7 +321,7 @@ extension GDRefreshControl {
         }
     }
 
-    override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         if let scrollView = self.scrollView {
             self.scrollView = scrollView
@@ -351,13 +351,13 @@ extension GDRefreshControl {
         }
     }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
         if keyPath != nil && keyPath! == "contentOffset" {
-            if let newPoint = change?[NSKeyValueChangeKey.newKey] as? CGPoint{
-                //                mylog(newPoint)//下拉变小
-                //                self.prepareRefresh(contentOffset: newPoint)
-            }
+//            if let newPoint = change?[NSKeyValueChangeKey.newKey] as? CGPoint{
+//                //                mylog(newPoint)//下拉变小
+//                //                self.prepareRefresh(contentOffset: newPoint)
+//            }
         }else{
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
@@ -385,7 +385,7 @@ extension GDRefreshControl : UIScrollViewDelegate{
     
     
     
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         self.fixFrame(scrollView: scrollView)
         if let refresh  = self.whetherCallRefreshDelegate(scrollView) {
             refresh.scrollViewWillBeginDragging(scrollView)
@@ -559,7 +559,7 @@ extension GDRefreshControl : UIScrollViewDelegate{
         }
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         //                mylog(newPoint)//下拉变小
         if let refresh  = self.whetherCallRefreshDelegate(scrollView) {
             refresh.scrollViewDidScroll(scrollView)
@@ -574,12 +574,12 @@ extension GDRefreshControl : UIScrollViewDelegate{
             return
         }
         var inset  = UIEdgeInsets.zero
-        var isNeedRefresh = false
+//        var isNeedRefresh = false
         switch self.direction {
             case  GDDirection.top:
                 if contentOffset.y < -refreshHeight {//可以刷新
                     inset.top = self.refreshHeight
-                    isNeedRefresh = true
+//                    isNeedRefresh = true
                     self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
                 }else{//下拉以刷新
                     if contentOffset.y  >= self.priviousContentOffset.y{//backing
@@ -593,7 +593,7 @@ extension GDRefreshControl : UIScrollViewDelegate{
             case  GDDirection.left:
                 if contentOffset.x < -refreshHeight {//可以刷新
                     inset.left = self.refreshHeight
-                    isNeedRefresh = true
+//                    isNeedRefresh = true
                     self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
                 }else{//右拉以刷新
 //                    self.updateTextAndImage(showStatus: GDShowStatus.pulling)
@@ -613,7 +613,7 @@ extension GDRefreshControl : UIScrollViewDelegate{
                         self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
                         mylog("松手可刷新")
                         inset.bottom = self.refreshHeight + ((scrollView?.bounds.size.height ?? 0) - (scrollView?.contentSize.height ?? 0))
-                        isNeedRefresh = true
+//                        isNeedRefresh = true
                     }else{//上拉以刷新
                         if contentOffset.y  <= self.priviousContentOffset.y{//backing
                             self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing)
@@ -631,7 +631,7 @@ extension GDRefreshControl : UIScrollViewDelegate{
                         self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
                         mylog("松手可刷新")
                         inset.bottom = self.refreshHeight
-                        isNeedRefresh = true
+//                        isNeedRefresh = true
                     }else{//上拉以刷新
                         if contentOffset.y  <= self.priviousContentOffset.y{//backing
                             self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing)
@@ -651,7 +651,7 @@ extension GDRefreshControl : UIScrollViewDelegate{
                         self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
                         mylog("松手可刷新")
                         inset.right = self.refreshHeight + ((scrollView?.bounds.size.width ?? 0) - (scrollView?.contentSize.width ?? 0))
-                        isNeedRefresh = true
+//                        isNeedRefresh = true
                     }else{//左拉以刷新
                         mylog("左拉以刷新")
                         if contentOffset.x  <= self.priviousContentOffset.x{//backing
@@ -669,7 +669,7 @@ extension GDRefreshControl : UIScrollViewDelegate{
                         self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
                         mylog("松手可刷新")
                         inset.right = self.refreshHeight
-                        isNeedRefresh = true
+//                        isNeedRefresh = true
                     }else{//左拉以刷新
                         mylog("左拉以刷新")
                         if contentOffset.x  <= self.priviousContentOffset.x{//backing
