@@ -607,7 +607,7 @@ extension GDLoadControl : UIScrollViewDelegate{
                     }
                 }
             }else{
-                if contentOffset.y > (scrollView?.contentSize.height ?? 0)  {//调整一下刷新控件的frame
+                if contentOffset.y > (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) {//调整一下刷新控件的frame
                     if let tempScrollView = self.scrollView {
                         self.fixFrame(scrollView: tempScrollView)
                     }                }
@@ -647,7 +647,7 @@ extension GDLoadControl : UIScrollViewDelegate{
                 }
             }else{
                 
-                if contentOffset.x > (scrollView?.contentSize.width ?? 0)  {//调整一下刷新控件的frame
+                if contentOffset.x > (scrollView?.contentSize.width ?? 0)  - (scrollView?.bounds.size.width ?? 0 ) {//调整一下刷新控件的frame
                     if let tempScrollView = self.scrollView {
                         self.fixFrame(scrollView: tempScrollView)
                     }
