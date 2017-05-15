@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		156967AC1EC993970038B7E5 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156967AB1EC993970038B7E5 /* TableViewCell.swift */; };
 		156B99091EC94B4E00B1AB4B /* GDLoadControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156B99071EC94B4E00B1AB4B /* GDLoadControl.swift */; };
 		156B990A1EC94B4E00B1AB4B /* GDRefreshControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156B99081EC94B4E00B1AB4B /* GDRefreshControl.swift */; };
 		15AD0AA51EC557E100945A2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AD0AA41EC557E100945A2B /* AppDelegate.swift */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		156967AB1EC993970038B7E5 /* TableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		156B99071EC94B4E00B1AB4B /* GDLoadControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDLoadControl.swift; sourceTree = "<group>"; };
 		156B99081EC94B4E00B1AB4B /* GDRefreshControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDRefreshControl.swift; sourceTree = "<group>"; };
 		15AD0AA11EC557E100945A2B /* GDRefreshControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GDRefreshControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,6 +78,7 @@
 				156B99061EC94B0F00B1AB4B /* code */,
 				15AD0AA41EC557E100945A2B /* AppDelegate.swift */,
 				15AD0AA61EC557E100945A2B /* ViewController.swift */,
+				156967AB1EC993970038B7E5 /* TableViewCell.swift */,
 				15AD0ABE1EC55A9300945A2B /* TableViewController.swift */,
 				15AD0AC21EC55B8B00945A2B /* llll.storyboard */,
 				15AD0AA81EC557E100945A2B /* Main.storyboard */,
@@ -166,6 +169,7 @@
 				15AD0AC01EC55A9300945A2B /* TableViewController.swift in Sources */,
 				15AD0AA71EC557E100945A2B /* ViewController.swift in Sources */,
 				15AD0AA51EC557E100945A2B /* AppDelegate.swift in Sources */,
+				156967AC1EC993970038B7E5 /* TableViewCell.swift in Sources */,
 				15AD0ABD1EC5591100945A2B /* pch.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
