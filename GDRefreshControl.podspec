@@ -91,7 +91,9 @@ s.license      = { :type => "MIT", :file => "LICENSE" }
   #  Not including the public_header_files will make all headers public.
   #
 
-  s.source_files  = "GDRefreshControl", "GDRefreshControl/code/**/*.swift"
+#s.source_files  = "GDRefreshControl", "GDRefreshControl/code/*.swift"
+s.source_files  = "GDRefreshControl/code/*.swift"
+
   s.exclude_files = "Classes/Exclude"
 
   # s.public_header_files = "Classes/**/*.h"
