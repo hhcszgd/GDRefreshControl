@@ -1,0 +1,6 @@
+framework module Pods_GDRefreshControl {
+  umbrella header "Pods-GDRefreshControl-umbrella.h"
+
+  export *
+  module * { export * }
+}

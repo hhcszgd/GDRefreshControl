@@ -18,6 +18,7 @@
 		15AD0ABD1EC5591100945A2B /* pch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AD0ABC1EC5591100945A2B /* pch.swift */; };
 		15AD0AC01EC55A9300945A2B /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AD0ABE1EC55A9300945A2B /* TableViewController.swift */; };
 		15AD0AC31EC55B8B00945A2B /* llll.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15AD0AC21EC55B8B00945A2B /* llll.storyboard */; };
+		3AAB7929DF642991D9B4BFD9 /* Pods_GDRefreshControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C04447962067ED02E6DC684A /* Pods_GDRefreshControl.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,9 @@
 		15AD0ABC1EC5591100945A2B /* pch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = pch.swift; sourceTree = "<group>"; };
 		15AD0ABE1EC55A9300945A2B /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		15AD0AC21EC55B8B00945A2B /* llll.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = llll.storyboard; sourceTree = "<group>"; };
+		C04447962067ED02E6DC684A /* Pods_GDRefreshControl.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GDRefreshControl.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB70376E28FE118138BEB6D0 /* Pods-GDRefreshControl.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GDRefreshControl.release.xcconfig"; path = "Pods/Target Support Files/Pods-GDRefreshControl/Pods-GDRefreshControl.release.xcconfig"; sourceTree = "<group>"; };
+		F97BAE80548AD89FCAE10289 /* Pods-GDRefreshControl.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GDRefreshControl.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GDRefreshControl/Pods-GDRefreshControl.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3AAB7929DF642991D9B4BFD9 /* Pods_GDRefreshControl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +66,8 @@
 			children = (
 				15AD0AA31EC557E100945A2B /* GDRefreshControl */,
 				15AD0AA21EC557E100945A2B /* Products */,
+				65EFA8B4211479BF95200CFC /* Pods */,
+				8297C7388DB784A81CA21665 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -90,6 +97,23 @@
 			path = GDRefreshControl;
 			sourceTree = "<group>";
 		};
+		65EFA8B4211479BF95200CFC /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				F97BAE80548AD89FCAE10289 /* Pods-GDRefreshControl.debug.xcconfig */,
+				EB70376E28FE118138BEB6D0 /* Pods-GDRefreshControl.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		8297C7388DB784A81CA21665 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C04447962067ED02E6DC684A /* Pods_GDRefreshControl.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -97,9 +121,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 15AD0AB31EC557E100945A2B /* Build configuration list for PBXNativeTarget "GDRefreshControl" */;
 			buildPhases = (
+				42066C32A41F3611B7213FEA /* [CP] Check Pods Manifest.lock */,
 				15AD0A9D1EC557E100945A2B /* Sources */,
 				15AD0A9E1EC557E100945A2B /* Frameworks */,
 				15AD0A9F1EC557E100945A2B /* Resources */,
+				83E7A55F5B8760C866B69D5D /* [CP] Embed Pods Frameworks */,
+				00A210D4ED2ABDA77D36D0B7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -158,6 +185,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		00A210D4ED2ABDA77D36D0B7 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GDRefreshControl/Pods-GDRefreshControl-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		42066C32A41F3611B7213FEA /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		83E7A55F5B8760C866B69D5D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GDRefreshControl/Pods-GDRefreshControl-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		15AD0A9D1EC557E100945A2B /* Sources */ = {
@@ -291,6 +366,7 @@
 		};
 		15AD0AB41EC557E100945A2B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F97BAE80548AD89FCAE10289 /* Pods-GDRefreshControl.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = EY693LHB6N;
@@ -304,6 +380,7 @@
 		};
 		15AD0AB51EC557E100945A2B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EB70376E28FE118138BEB6D0 /* Pods-GDRefreshControl.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = EY693LHB6N;

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import GDRefreshControl
 class TableViewController: UITableViewController {
     var rows  : Int = 13
     
