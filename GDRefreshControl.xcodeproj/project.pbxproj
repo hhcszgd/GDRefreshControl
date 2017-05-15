@@ -7,19 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		156B99091EC94B4E00B1AB4B /* GDLoadControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156B99071EC94B4E00B1AB4B /* GDLoadControl.swift */; };
+		156B990A1EC94B4E00B1AB4B /* GDRefreshControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156B99081EC94B4E00B1AB4B /* GDRefreshControl.swift */; };
 		15AD0AA51EC557E100945A2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AD0AA41EC557E100945A2B /* AppDelegate.swift */; };
 		15AD0AA71EC557E100945A2B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AD0AA61EC557E100945A2B /* ViewController.swift */; };
 		15AD0AAA1EC557E100945A2B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15AD0AA81EC557E100945A2B /* Main.storyboard */; };
 		15AD0AAC1EC557E100945A2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 15AD0AAB1EC557E100945A2B /* Assets.xcassets */; };
 		15AD0AAF1EC557E100945A2B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15AD0AAD1EC557E100945A2B /* LaunchScreen.storyboard */; };
-		15AD0AB81EC5582000945A2B /* GDLoadControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AD0AB61EC5582000945A2B /* GDLoadControl.swift */; };
-		15AD0AB91EC5582000945A2B /* GDRefreshControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AD0AB71EC5582000945A2B /* GDRefreshControl.swift */; };
 		15AD0ABD1EC5591100945A2B /* pch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AD0ABC1EC5591100945A2B /* pch.swift */; };
 		15AD0AC01EC55A9300945A2B /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AD0ABE1EC55A9300945A2B /* TableViewController.swift */; };
 		15AD0AC31EC55B8B00945A2B /* llll.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15AD0AC21EC55B8B00945A2B /* llll.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		156B99071EC94B4E00B1AB4B /* GDLoadControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDLoadControl.swift; sourceTree = "<group>"; };
+		156B99081EC94B4E00B1AB4B /* GDRefreshControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDRefreshControl.swift; sourceTree = "<group>"; };
 		15AD0AA11EC557E100945A2B /* GDRefreshControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GDRefreshControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15AD0AA41EC557E100945A2B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		15AD0AA61EC557E100945A2B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -27,8 +29,6 @@
 		15AD0AAB1EC557E100945A2B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		15AD0AAE1EC557E100945A2B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		15AD0AB01EC557E100945A2B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		15AD0AB61EC5582000945A2B /* GDLoadControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDLoadControl.swift; sourceTree = "<group>"; };
-		15AD0AB71EC5582000945A2B /* GDRefreshControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDRefreshControl.swift; sourceTree = "<group>"; };
 		15AD0ABC1EC5591100945A2B /* pch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = pch.swift; sourceTree = "<group>"; };
 		15AD0ABE1EC55A9300945A2B /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		15AD0AC21EC55B8B00945A2B /* llll.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = llll.storyboard; sourceTree = "<group>"; };
@@ -45,6 +45,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		156B99061EC94B0F00B1AB4B /* code */ = {
+			isa = PBXGroup;
+			children = (
+				156B99071EC94B4E00B1AB4B /* GDLoadControl.swift */,
+				156B99081EC94B4E00B1AB4B /* GDRefreshControl.swift */,
+			);
+			path = code;
+			sourceTree = "<group>";
+		};
 		15AD0A981EC557E100945A2B = {
 			isa = PBXGroup;
 			children = (
@@ -64,8 +73,7 @@
 		15AD0AA31EC557E100945A2B /* GDRefreshControl */ = {
 			isa = PBXGroup;
 			children = (
-				15AD0AB61EC5582000945A2B /* GDLoadControl.swift */,
-				15AD0AB71EC5582000945A2B /* GDRefreshControl.swift */,
+				156B99061EC94B0F00B1AB4B /* code */,
 				15AD0AA41EC557E100945A2B /* AppDelegate.swift */,
 				15AD0AA61EC557E100945A2B /* ViewController.swift */,
 				15AD0ABE1EC55A9300945A2B /* TableViewController.swift */,
@@ -153,11 +161,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				156B990A1EC94B4E00B1AB4B /* GDRefreshControl.swift in Sources */,
+				156B99091EC94B4E00B1AB4B /* GDLoadControl.swift in Sources */,
 				15AD0AC01EC55A9300945A2B /* TableViewController.swift in Sources */,
-				15AD0AB91EC5582000945A2B /* GDRefreshControl.swift in Sources */,
 				15AD0AA71EC557E100945A2B /* ViewController.swift in Sources */,
 				15AD0AA51EC557E100945A2B /* AppDelegate.swift in Sources */,
-				15AD0AB81EC5582000945A2B /* GDLoadControl.swift in Sources */,
 				15AD0ABD1EC5591100945A2B /* pch.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -322,6 +330,7 @@
 				15AD0AB51EC557E100945A2B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
