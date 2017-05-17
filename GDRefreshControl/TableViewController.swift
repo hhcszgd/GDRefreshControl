@@ -18,25 +18,37 @@ class TableViewController: UITableViewController {
     }
     
     func load(/***/)  {
-        self.rows = self.rows + 4
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
-            
-            self.tableView.gdLoadControl?.endLoad(result: GDLoadResult.nomore)
+//        self.rows = self.rows + 4
+//        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+        
             self.tableView.reloadData()
+            self.tableView.gdLoadControl?.endLoad(result: GDLoadResult.nomore)
+//        }
+    }
+    func testyyy() {
+        var count: UInt32 = 3
+        let objc_property_tS = class_copyPropertyList(UIScrollView.self  , &count)
+        for i in 0 ..< count {
+            let objc_property_tO = objc_property_tS![Int(i)]
+            let name = property_getName(objc_property_tO)
+            mylog(String(cString: name!))
         }
+        free(objc_property_tS)
     }
     override func viewDidLoad() {
         super.viewDidLoad()
         print(UIDevice.current.systemVersion)
-        
-        //self.tableView.rowHeight = UITableViewAutomaticDimension
+        self.testyyy()
+        self.tableView.rowHeight = UITableViewAutomaticDimension
         self.tableView.estimatedRowHeight = 100
+//        self.tableView.rowHeight = 99
         let refresh = GDRefreshControl.init(target: self , selector: #selector(dddddd))
+        refresh.direction = GDDirection.bottom
         self.tableView.gdRefreshControl = refresh
         
         
-        let load = GDLoadControl.init(target: self , selector: #selector(self.load))
-        self.tableView.gdLoadControl = load
+//        let load = GDLoadControl.init(target: self , selector: #selector(self.load))
+//        self.tableView.gdLoadControl = load
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -69,7 +81,9 @@ class TableViewController: UITableViewController {
             
         }
         if let realCell = cell as? TableViewCell {
-            realCell.txt = "那年萨拉斯柯达;阿里斯顿解放路控件来拉看似简单;浪费空间;李克军ki0opuwe9ur 拉斯克奖分类阿拉山口记得发"
+            realCell.txt = "那年萨拉斯柯达;阿里斯顿解放路控件来拉看似简单;浪费空间;李克军ki0opuwe9ur 拉斯克奖分类阿拉山口记得发\(indexPath.row)"
+        }else{
+            cell?.textLabel?.text = "哈哦啊热油爱上了历史地看解放军爱丽丝打开房间啊; 卢卡斯柯耳机哦哦啊哦念书氨基酸空荡荡的拉拉队龙卷风\(indexPath.row)"
         }
         // Configure the cell...
         //        cell?.textLabel?.text = indexPath.row.description

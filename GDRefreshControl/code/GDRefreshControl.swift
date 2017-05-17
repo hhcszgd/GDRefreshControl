@@ -1,4 +1,4 @@
-//
+   //
 //  GDRefreshControl.swift
 //  zjlao
 //
@@ -49,23 +49,11 @@ public enum GDDirection {
     case bottom
     case right
 }
-public class GDRefreshControl: UIControl {
-    lazy var titleLabel = UILabel()
-    lazy var imageView  = UIImageView()
+public class GDRefreshControl: GDBaseControl {
     public var refreshHeight : CGFloat = 100
     
+    var showStatus = GDShowStatus.idle
     
-    fileprivate var originalIspagingEnable = false
-    fileprivate var originalContentInset = UIEdgeInsets.zero
-    fileprivate var originalContentOffset = CGPoint.zero
-    
-    fileprivate var priviousContentOffset = CGPoint.zero
-    fileprivate var showStatus = GDShowStatus.idle
-//    var refreshType  = GDRefreshType.auto
-    
-    
-    public var direction : GDDirection = GDDirection.top
-    fileprivate var scrollView : UIScrollView?
     
     fileprivate weak var refreshTarget : AnyObject?
     fileprivate var refreshAction : Selector?
@@ -143,6 +131,7 @@ public class GDRefreshControl: UIControl {
         self.addSubview(self.titleLabel)
         self.titleLabel.textAlignment = NSTextAlignment.center
         self.titleLabel.numberOfLines = 0
+        self.direction = GDDirection.top
     }
     
     public convenience  init(target: AnyObject? , selector : Selector?) {
@@ -178,7 +167,9 @@ extension GDRefreshControl {
     
     func performRefresh()  {//避免重复刷新TODO
         mylog("开始刷新  偏移量\(String(describing: self.scrollView?.contentOffset))")
-        
+        if let load  = self.scrollView?.gdLoadControl  {
+            load.loadStatus = GDLoadStatus.idle
+        }
         self.updateTextAndImage(showStatus: GDShowStatus.refreshing , actionType: GDShowStatus.refreshing)
         mylog(scrollView?.contentInset)
         if self.refreshAction != nil && self.refreshTarget != nil {
@@ -187,26 +178,28 @@ extension GDRefreshControl {
     }
     
     public func endRefresh(result : GDRefreshResult = GDRefreshResult.success)  {
-        var delay : TimeInterval = 1
 
         if  self.refreshStatus == GDRefreshStatus.refreshing {
             mylog("结束刷新 偏移量\(String(describing: self.scrollView?.contentOffset))")
             if result == GDRefreshResult.success {
-                delay = 0 
                 self.updateTextAndImage(showStatus: GDShowStatus.refreshSuccess , actionType:  GDShowStatus.refreshed)
             }else if result == GDRefreshResult.failure{
                 self.updateTextAndImage(showStatus: GDShowStatus.refreshFailure , actionType:  GDShowStatus.refreshed)
             }else if result == GDRefreshResult.networkError{
                 self.updateTextAndImage(showStatus: GDShowStatus.netWorkError , actionType:  GDShowStatus.refreshed)
             }
-//            self.updateTextAndImage(contentOffset: CGPoint.zero)//
-            UIView.animate(withDuration: 0.1, delay: delay, options: UIViewAnimationOptions.curveEaseInOut, animations: {
+
+            if result == GDRefreshResult.success {
                 self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
-                if self.scrollView != nil {
-                    self.fixFrame(scrollView: self.scrollView!)
-                }
-            }) { (bool) in
                 self.refreshStatus = GDRefreshStatus.idle
+            }else{
+                UIView.animate(withDuration: 0.2, delay: 0.5, options: UIViewAnimationOptions.curveEaseInOut, animations: {
+                    self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+
+                }) { (bool) in
+                    self.refreshStatus = GDRefreshStatus.idle
+                }
+                
             }
         }
     }
@@ -301,67 +294,67 @@ extension GDRefreshControl {
     
     
     
-    override public func willMove(toSuperview newSuperview: UIView?) {//important
-        super.willMove(toSuperview: newSuperview)
-        if newSuperview == nil  {//将要从tableView上移除之前(提前与deinit),先移除scrollView的contentOffset的监听 , 否则会崩溃
-//            if let scrollView = self.superview as? UIScrollView {
-//                scrollView.removeObserver(self , forKeyPath: "contentOffset")
+//    override public func willMove(toSuperview newSuperview: UIView?) {//important
+//        super.willMove(toSuperview: newSuperview)
+//        if newSuperview == nil  {//将要从tableView上移除之前(提前与deinit),先移除scrollView的contentOffset的监听 , 否则会崩溃
+////            if let scrollView = self.superview as? UIScrollView {
+////                scrollView.removeObserver(self , forKeyPath: "contentOffset")
+////            }
+//        }else{
+//            if let scrollView = newSuperview as? UIScrollView {
+//                self.scrollView = scrollView
+//                self.originalIspagingEnable = scrollView.isPagingEnabled
+//                self.originalContentInset = scrollView.contentInset
+//                self.originalContentOffset = scrollView.contentOffset
+//                mylog("最初赋值时 , 滚动控件的滚动范围\(scrollView.contentSize)")
+//                self.fixFrame(scrollView: scrollView)
+////                scrollView.delegate = self//监听contentOffset改用代理的形式
+////                scrollView.addObserver(self , forKeyPath: "contentOffset", options: NSKeyValueObservingOptions.new, context: nil)
 //            }
-        }else{
-            if let scrollView = newSuperview as? UIScrollView {
-                self.scrollView = scrollView
-                self.originalIspagingEnable = scrollView.isPagingEnabled
-                self.originalContentInset = scrollView.contentInset
-                self.originalContentOffset = scrollView.contentOffset
-                mylog("最初赋值时 , 滚动控件的滚动范围\(scrollView.contentSize)")
-                self.fixFrame(scrollView: scrollView)
-                scrollView.delegate = self//监听contentOffset改用代理的形式
-//                scrollView.addObserver(self , forKeyPath: "contentOffset", options: NSKeyValueObservingOptions.new, context: nil)
-            }
-        }
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        if let scrollView = self.scrollView {
-            self.scrollView = scrollView
-            self.originalIspagingEnable = scrollView.isPagingEnabled
-            self.originalContentInset = scrollView.contentInset
-            self.originalContentOffset = scrollView.contentOffset
-//            mylog("最初赋值时 , 滚动控件的滚动范围\(scrollView.contentSize)")//此时的contentSize才有值
-            self.fixFrame(scrollView: scrollView)
-//            scrollView.delegate = self//监听contentOffset改用代理的形式
-            //                scrollView.addObserver(self , forKeyPath: "contentOffset", options: NSKeyValueObservingOptions.new, context: nil)
-        }
-        
-        if let collection  = self.scrollView as? UICollectionView {//保证Collection的滚动
-            if let flowLayout  = collection.collectionViewLayout as? UICollectionViewFlowLayout {
-                if flowLayout.scrollDirection == UICollectionViewScrollDirection.horizontal {
-                    collection.bounces = true
-                    collection.alwaysBounceVertical = false
-                    collection.alwaysBounceHorizontal = true
-                }else if flowLayout.scrollDirection == UICollectionViewScrollDirection.vertical {
-                    collection.bounces = true
-                    collection.alwaysBounceVertical = true
-                    collection.alwaysBounceHorizontal = false
-                }
-                
-                
-            }
-        }
-    }
-    
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
-        if keyPath != nil && keyPath! == "contentOffset" {
-//            if let newPoint = change?[NSKeyValueChangeKey.newKey] as? CGPoint{
-//                //                mylog(newPoint)//下拉变小
-//                //                self.prepareRefresh(contentOffset: newPoint)
+//        }
+//    }
+//
+//    override public func layoutSubviews() {
+//        super.layoutSubviews()
+//        if let scrollView = self.scrollView {
+//            self.scrollView = scrollView
+//            self.originalIspagingEnable = scrollView.isPagingEnabled
+//            self.originalContentInset = scrollView.contentInset
+//            self.originalContentOffset = scrollView.contentOffset
+////            mylog("最初赋值时 , 滚动控件的滚动范围\(scrollView.contentSize)")//此时的contentSize才有值
+//            self.fixFrame(scrollView: scrollView)
+////            scrollView.delegate = self//监听contentOffset改用代理的形式
+//            //                scrollView.addObserver(self , forKeyPath: "contentOffset", options: NSKeyValueObservingOptions.new, context: nil)
+//        }
+//        
+//        if let collection  = self.scrollView as? UICollectionView {//保证Collection的滚动
+//            if let flowLayout  = collection.collectionViewLayout as? UICollectionViewFlowLayout {
+//                if flowLayout.scrollDirection == UICollectionViewScrollDirection.horizontal {
+//                    collection.bounces = true
+//                    collection.alwaysBounceVertical = false
+//                    collection.alwaysBounceHorizontal = true
+//                }else if flowLayout.scrollDirection == UICollectionViewScrollDirection.vertical {
+//                    collection.bounces = true
+//                    collection.alwaysBounceVertical = true
+//                    collection.alwaysBounceHorizontal = false
+//                }
+//                
+//                
 //            }
-        }else{
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
-    }
+//        }
+//    }
+//
+//    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+//        
+//        if keyPath != nil && keyPath! == "contentOffset" {
+////            if let newPoint = change?[NSKeyValueChangeKey.newKey] as? CGPoint{
+////                //                mylog(newPoint)//下拉变小
+////                //                self.prepareRefresh(contentOffset: newPoint)
+////            }
+//        }else{
+//            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+//        }
+//    }
     
     
 }
@@ -369,28 +362,21 @@ extension GDRefreshControl {
 
 
 // MARK: 注释 : UIScrollViewDelegate
-extension GDRefreshControl : UIScrollViewDelegate{
+extension GDRefreshControl{
     
-    // MARK: 注释 : 是否调用刷新控件的代理
-    func whetherCallRefreshDelegate(_ scrollView:UIScrollView) -> GDLoadControl?  {
-        if let _ =  scrollView.delegate as? GDRefreshControl {
-            if let load  = scrollView.gdLoadControl  {
-                return load
-            }
+
+    public override func scrollViewContentSizeChanged(){
+        
+        if let scroll = self.scrollView {
+            mylog("监听contentSize : \(String(describing: scroll.contentSize))")
+            self.fixFrame(scrollView: scroll)//自动布局是 , scrollView的contentSize是动态变化的, 所以要实时调整加载控件的frame
         }
-        return nil
     }
     
     
     
-    
-    
-    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.fixFrame(scrollView: scrollView)
-        if let refresh  = self.whetherCallRefreshDelegate(scrollView) {
-            refresh.scrollViewWillBeginDragging(scrollView)
-        }
-//        self.refreshType = GDRefreshType.manual
+    public override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+
         // MARK: 注释 a: 当用户拖动时 , 还原滚动控件的isPagingEnable
         if scrollView.isPagingEnabled != self.originalIspagingEnable {
             self.scrollView?.isPagingEnabled = self.originalIspagingEnable
@@ -399,11 +385,9 @@ extension GDRefreshControl : UIScrollViewDelegate{
     }
     
     
-    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool){
+    public override func scrollViewDidEndDragging(_ scrollView: UIScrollView){
         mylog("松手了  ,当前偏移量是\(scrollView.contentOffset)")
-        if let refresh  = self.whetherCallRefreshDelegate(scrollView) {
-            refresh.scrollViewDidEndDragging(scrollView, willDecelerate: decelerate)
-        }
+
          self.backgroundColor = UIColor.orange
         if self.refreshStatus != GDRefreshStatus.refreshing {
             self.setrefershStatusEndDrag(contentOffset: scrollView.contentOffset)
@@ -484,12 +468,15 @@ extension GDRefreshControl : UIScrollViewDelegate{
         }
         if isNeedRefresh {
             // MARK: 注释 a: CollectionView的isPagingEnagle = true , 会影响contentInset的设置,不会发生预设的偏移 , 所以 , 设置contentInset之前, 设置为flase , 当用户拖动时再还原到用户设定的状态
-            self.scrollView?.isPagingEnabled = false
-            self.performRefresh()
 
-            UIView.animate(withDuration: 0.25, animations: {
+            UIView.animate(withDuration: 0.25, animations: { 
                 self.scrollView?.contentInset = inset
                 self.scrollView?.contentOffset = tempContentOffset
+                
+            }, completion: { (bool ) in
+                
+                self.scrollView?.isPagingEnabled = false
+                self.performRefresh()
             })
         }
     }
@@ -559,11 +546,11 @@ extension GDRefreshControl : UIScrollViewDelegate{
         }
     }
     
-    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         //                mylog(newPoint)//下拉变小
-        if let refresh  = self.whetherCallRefreshDelegate(scrollView) {
-            refresh.scrollViewDidScroll(scrollView)
-        }
+//        if let refresh  = self.whetherCallRefreshDelegate(scrollView) {
+//            refresh.scrollViewDidScroll(scrollView)
+//        }
         if self.refreshStatus != GDRefreshStatus.refreshing {
             self.adjustContentInset(contentOffset: scrollView.contentOffset)
         }
@@ -628,11 +615,7 @@ extension GDRefreshControl : UIScrollViewDelegate{
                         }
                     }
                 }else{
-                    if contentOffset.y >= self.frame.origin.y  - (scrollView?.bounds.size.height ?? 0 ) && contentOffset.y < (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ){//调整一下刷新控件的frame
-                        if let tempScrollView = self.scrollView {
-                            self.fixFrame(scrollView: tempScrollView)
-                        }
-                    }
+
                     if contentOffset.y > (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + refreshHeight {//可以刷新
                         self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
                         mylog("松手可刷新")
@@ -670,14 +653,7 @@ extension GDRefreshControl : UIScrollViewDelegate{
                         }
                     }
                 }else{
-                 
-                    if contentOffset.x >= self.frame.origin.x  - (scrollView?.bounds.size.width ?? 0 ) && contentOffset.x < (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ){//调整一下刷新控件的frame
-                        if let tempScrollView = self.scrollView {
-                            self.fixFrame(scrollView: tempScrollView)
-                        }
-                    }
-                    
-                    
+
                     
                     if contentOffset.x > (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + refreshHeight {//可以刷新
                         self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)

@@ -89,7 +89,6 @@ class TableViewCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        print("ddddddddddd")
         
 //        self.txtLabel.snp.remakeConstraints({ (make ) in
 //            make.center.equalTo(self.contentView)
