@@ -39,7 +39,9 @@ public func mylog <T>(_ message: T, fileName: String = #file, methodName: String
 //MARK: 直接从Resource中获取文件
 
 func gotResourceInSubBundle(_ name : String,type : String,directory : String?) -> String? {
-    guard let subBundlePath = Bundle.main.path(forResource: "Resource", ofType: "bundle") else {return nil}
+    let bundle : Bundle = Bundle(for: GDBaseControl.self)       //refreshBundle = [NSBundle bundleWithPath:[[NSBundle bundleForClass:[MJRefreshComponent class]] pathForResource:@"MJRefresh" ofType:@"bundle"]];
+    
+    guard let subBundlePath = bundle.path(forResource: "Resource", ofType: "bundle") else {return nil}
     guard let subBundle = Bundle(path: subBundlePath) else {return nil  }
     if let tempDirectory = directory {
         guard let itemPath = subBundle.path(forResource: name, ofType: type, inDirectory: tempDirectory) else {return nil}
@@ -48,6 +50,15 @@ func gotResourceInSubBundle(_ name : String,type : String,directory : String?) -
         guard let  itemPath = subBundle.path(forResource: name, ofType: type) else {  return nil  }
         return itemPath
     }
+//    guard let subBundlePath = Bundle.main.path(forResource: "Resource", ofType: "bundle") else {return nil}
+//    guard let subBundle = Bundle(path: subBundlePath) else {return nil  }
+//    if let tempDirectory = directory {
+//        guard let itemPath = subBundle.path(forResource: name, ofType: type, inDirectory: tempDirectory) else {return nil}
+//        return itemPath
+//    }else{
+//        guard let  itemPath = subBundle.path(forResource: name, ofType: type) else {  return nil  }
+//        return itemPath
+//    }
 }
 
 
