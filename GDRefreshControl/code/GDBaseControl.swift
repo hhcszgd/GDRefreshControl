@@ -18,9 +18,22 @@ import UIKit
 
 
 public class GDBaseControl: UIView {
-    lazy var titleLabel = UILabel()
-    lazy var imageView  = UIImageView()
+    public var customView : UIView?{
+        didSet{
+            oldValue?.removeFromSuperview()
+            if customView != nil  {
+                self.addSubview(customView!)
+            }
+        }
+    }
+    public lazy var titleLabel = UILabel()
+    public lazy var imageView  = UIImageView()
     var pan : UIPanGestureRecognizer?
+    
+    /// if you want change titleLable's frame , by this var
+    public var labelFrame = CGRect.zero
+    /// if you want change imageView's frame , by this var
+    public var imageViewFrame = CGRect.zero
     
     
     var originalIspagingEnable = false
@@ -35,10 +48,15 @@ public class GDBaseControl: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = UIColor.orange
         self.addSubview(self.titleLabel)
+        self.addSubview(imageView)
+        imageView.contentMode = UIViewContentMode.scaleAspectFit
         self.titleLabel.textAlignment = NSTextAlignment.center
         self.titleLabel.numberOfLines = 0
+        self.titleLabel.font = UIFont.systemFont(ofSize: 14)
+        self.titleLabel.textColor = UIColor.init(colorLiteralRed: 180 / 256, green: 180 / 256, blue: 180 / 256, alpha: 1)
+        self.backgroundColor =  UIColor.init(colorLiteralRed: 251 / 256, green: 251 / 256, blue: 251 / 256, alpha: 1)
+        
     }
     
 

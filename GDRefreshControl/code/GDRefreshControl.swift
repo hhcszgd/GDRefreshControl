@@ -50,7 +50,37 @@ public enum GDDirection {
     case right
 }
 public class GDRefreshControl: GDBaseControl {
-    public var refreshHeight : CGFloat = 100
+    public var refreshHeight : CGFloat = 88
+    
+    public var pullingImages : [UIImage] = pullingImagesForRefresh(){
+        didSet{
+        }
+    }
+    public var refreshingImages : [UIImage] = refreshingImgs(){
+        didSet{
+            
+        }
+    }
+    
+    public var networkErrorImage : UIImage = networkErrorImageForRefresh(){
+        didSet{
+            
+        }
+    }
+    
+    public var successImage : UIImage = successImagesForRefresh(){
+        didSet{
+            
+        }
+    }
+    
+    public var failureImage : UIImage = failureImagesForRefresh(){
+        didSet{
+            
+        }
+    }
+
+    
     
     var showStatus = GDShowStatus.idle
     
@@ -127,8 +157,6 @@ public class GDRefreshControl: GDBaseControl {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = UIColor.orange
-        self.addSubview(self.titleLabel)
         self.titleLabel.textAlignment = NSTextAlignment.center
         self.titleLabel.numberOfLines = 0
         self.direction = GDDirection.top
@@ -177,6 +205,9 @@ extension GDRefreshControl {
         }
     }
     
+    /// call after reloadData(tableView)
+    ///
+    /// - Parameter result:  forExample : success , networkError or failure
     public func endRefresh(result : GDRefreshResult = GDRefreshResult.success)  {
 
         if  self.refreshStatus == GDRefreshStatus.refreshing {
@@ -213,29 +244,48 @@ extension GDRefreshControl {
     
     
     
-    func updateTextAndImage(showStatus : GDShowStatus , actionType : GDShowStatus = GDShowStatus.pulling/*拖动中还是弹回中*/,contentOffset : CGPoint = CGPoint.zero)  {
+    func updateTextAndImage(showStatus : GDShowStatus , actionType : GDShowStatus = GDShowStatus.pulling/*拖动中还是弹回中*/,scale : CGFloat = 0)  {
         var title  = ""
-        
+        if self.imageView.isAnimating {
+            self.imageView.stopAnimating()
+        }
         if showStatus == GDShowStatus.pulling && actionType == GDShowStatus.pulling {
             //下拉以加载
             title = "拖动以刷新"
+            let a : Int =  Int(( CGFloat( self.pullingImages.count) * scale))
+            if a > 0 && a < self.pullingImages.count {
+                self.imageView.image = self.pullingImages[a]
+                
+            }
         }else if showStatus == GDShowStatus.pulling && actionType == GDShowStatus.backing && self.refreshStatus != GDRefreshStatus.refreshing{
             //下拉以加载
             title = "拖动以刷新"
+            let a : Int =  Int(( CGFloat( self.pullingImages.count) * scale))
+            if a > 0 && a < self.pullingImages.count {
+                self.imageView.image = self.pullingImages[a]
+                
+            }
         }else if showStatus == GDShowStatus.prepareRefreshing  {
             title = "松手刷新"
             //松手以刷新
         }else if showStatus == GDShowStatus.refreshing && actionType == GDShowStatus.refreshing{
             title = "刷新中"
+            self.imageView.animationImages = self.refreshingImages
+            self.imageView.animationDuration = 0.5
+            self.imageView.animationRepeatCount = 19
+            self.imageView.startAnimating()
             //刷新中
         }else if showStatus ==  GDShowStatus.refreshSuccess && actionType == GDShowStatus.refreshed{
             title = "刷新成功"
+            self.imageView.image = self.successImage
             //刷新成功
         }else if showStatus ==  GDShowStatus.refreshFailure && actionType == GDShowStatus.refreshed{
             title = "刷新失败"
+            self.imageView.image = self.failureImage
             //刷新失败
         }else if showStatus ==  GDShowStatus.netWorkError && actionType == GDShowStatus.refreshed{
             title = "网络错误"
+            self.imageView.image = self.networkErrorImage
             //网络错误
         }
         
@@ -256,12 +306,33 @@ extension GDRefreshControl {
         switch self.direction {
         case  GDDirection.top:
             self.frame = CGRect(x: 0, y: -refreshHeight, width: scrollView.bounds.size.width, height: refreshHeight)
-            self.titleLabel.frame = CGRect(x: 0, y: self.bounds.size.height - self.titleLabel.font.lineHeight, width: self.bounds.size.width, height: self.titleLabel.font.lineHeight)
-            
+            if self.labelFrame == CGRect.zero {
+                self.titleLabel.frame = CGRect(x: 0, y: self.bounds.size.height * 0.5, width: self.bounds.size.width, height: self.titleLabel.font.lineHeight)
+            }else{
+                self.titleLabel.frame = self.labelFrame
+            }
+            if self.imageViewFrame == CGRect.zero {
+                
+                self.imageView.frame = CGRect(x: 10, y: self.bounds.size.height * 0.1, width: self.bounds.size.height * 0.8, height: self.bounds.size.height * 0.8)
+            }else{
+                self.imageView.frame = self.imageViewFrame
+            }
+
             break
         case  GDDirection.left:
             self.frame = CGRect(x: -refreshHeight, y: 0, width: refreshHeight, height: scrollView.bounds.size.height)
-            self.titleLabel.frame = CGRect(x: self.bounds.size.width - self.titleLabel.font.lineHeight, y: 0, width: self.titleLabel.font.lineHeight, height: self.bounds.size.height)
+            if self.labelFrame == CGRect.zero {
+                
+                self.titleLabel.frame = CGRect(x: self.bounds.size.width  * 0.5, y: 0, width: self.titleLabel.font.lineHeight, height: self.bounds.size.height)
+            }else{
+                self.titleLabel.frame = self.labelFrame
+            }
+            if self.imageViewFrame == CGRect.zero {
+                self.imageView.frame = CGRect(x: self.bounds.size.width * 0.1, y: 10, width: self.bounds.size.width * 0.8, height: self.bounds.size.width * 0.8)
+            }else{
+                self.imageView.frame = self.imageViewFrame
+            }
+            
             break
         case  GDDirection.bottom:
             
@@ -270,17 +341,37 @@ extension GDRefreshControl {
             }else{
                 self.frame = CGRect(x: 0, y: scrollView.contentSize.height , width:scrollView.bounds.size.width  ,  height: refreshHeight)
             }
-            self.titleLabel.frame = CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.titleLabel.font.lineHeight)
+            if self.labelFrame == CGRect.zero {
+                self.titleLabel.frame = CGRect(x: 0, y:  self.bounds.size.height * 0.4, width: self.bounds.size.width, height: self.titleLabel.font.lineHeight)
+            }else{
+                self.titleLabel.frame  = self.labelFrame
+            }
+            if self.imageViewFrame == CGRect.zero {
+                self.imageView.frame = CGRect(x: 10, y: self.bounds.size.height * 0.1, width: self.bounds.size.height * 0.8, height: self.bounds.size.height * 0.8)
+            }else{
+                self.imageView.frame = self.imageViewFrame
+            }
+
             break
         case  GDDirection.right:
             
             if scrollView.contentSize.width < scrollView.bounds.size.width{
                 self.frame = CGRect(x: scrollView.bounds.size.width, y: 0, width: refreshHeight  ,  height: scrollView.bounds.size.height )
             }else{
-                
                 self.frame = CGRect(x: scrollView.contentSize.width, y: 0, width: refreshHeight, height: scrollView.bounds.size.height)
             }
-            self.titleLabel.frame = CGRect(x: self.titleLabel.font.lineHeight, y: 0, width: self.titleLabel.font.lineHeight, height: self.bounds.size.height)
+            if self.labelFrame == CGRect.zero {
+                
+                self.titleLabel.frame = CGRect(x: self.bounds.size.width * 0.4, y: 0, width: self.titleLabel.font.lineHeight, height: self.bounds.size.height)
+            }else{
+                self.titleLabel.frame = self.labelFrame
+            }
+            if self.imageViewFrame == CGRect.zero{
+                self.imageView.frame = CGRect(x: self.bounds.size.width * 0.1, y: 10, width: self.bounds.size.width * 0.8, height: self.bounds.size.width * 0.8)
+            }else{
+                self.imageView.frame = self.imageViewFrame
+            }
+            
             break
         }
     }
@@ -388,7 +479,6 @@ extension GDRefreshControl{
     public override func scrollViewDidEndDragging(_ scrollView: UIScrollView){
         mylog("松手了  ,当前偏移量是\(scrollView.contentOffset)")
 
-         self.backgroundColor = UIColor.orange
         if self.refreshStatus != GDRefreshStatus.refreshing {
             self.setrefershStatusEndDrag(contentOffset: scrollView.contentOffset)
             
@@ -566,15 +656,26 @@ extension GDRefreshControl{
 //        var isNeedRefresh = false
         switch self.direction {
             case  GDDirection.top:
+                
+                var scale : CGFloat   = 0
+                
+                if contentOffset.y <=  0 && contentOffset.y >=  -refreshHeight   {
+                    
+                    scale = -contentOffset.y  / refreshHeight
+                    mylog(scale)
+                    
+                }
+                
+                
                 if contentOffset.y < -refreshHeight {//可以刷新
                     inset.top = self.refreshHeight
 //                    isNeedRefresh = true
                     self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
                 }else{//下拉以刷新
                     if contentOffset.y  >= self.priviousContentOffset.y{//backing
-                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing)
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing , scale:  scale)
                     }else{//pulling
-                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling)
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling , scale:  scale)
                     }
                 }
                 
@@ -585,13 +686,24 @@ extension GDRefreshControl{
 //                    isNeedRefresh = true
                     self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
                 }else{//右拉以刷新
+                    
+                    
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.x <=  0 && contentOffset.x >=  -refreshHeight   {
+                        
+                        scale = -contentOffset.x  / refreshHeight
+                        mylog(scale)
+                        
+                    }
+                    
 //                    self.updateTextAndImage(showStatus: GDShowStatus.pulling)
                     if contentOffset.x  >= self.priviousContentOffset.x{//backing
-                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing)
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing , scale:  scale)
 //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
 //                        mylog("回去")
                     }else{//pulling
-                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling)
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling , scale:  scale)
                     }
                 }
                 break
@@ -604,13 +716,24 @@ extension GDRefreshControl{
                         inset.bottom = self.refreshHeight + ((scrollView?.bounds.size.height ?? 0) - (scrollView?.contentSize.height ?? 0))
 //                        isNeedRefresh = true
                     }else{//上拉以刷新
+                        var scale : CGFloat   = 0
+                        
+                        if contentOffset.y >=  0 && contentOffset.y <=  refreshHeight   {
+                            
+                            scale = contentOffset.y  / refreshHeight
+                            mylog(scale)
+                            
+                        }
+                        
+                        
+                        
                         if contentOffset.y  <= self.priviousContentOffset.y{//backing
-                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing)
-                            //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
-                            //                        mylog("回去")
+                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing , scale: scale)
+                           
+                            
                         }else{//pulling
-                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling)
-//                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling, scale: scale)
+
                             mylog("上拉以刷新")
                         }
                     }
@@ -622,13 +745,22 @@ extension GDRefreshControl{
                         inset.bottom = self.refreshHeight
 //                        isNeedRefresh = true
                     }else{//上拉以刷新
+                        var scale : CGFloat   = 0
+                        
+                        if contentOffset.y <=  (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + refreshHeight && contentOffset.y >=  (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 )   {
+                            
+                            scale = (contentOffset.y - ((scrollView?.contentSize.height ?? 0)  - (scrollView?.bounds.size.height ?? 0 ) ) ) / refreshHeight
+                            mylog(scale)
+                            
+                        }
+
                         if contentOffset.y  <= self.priviousContentOffset.y{//backing
-                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing)
+                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing, scale: scale)
                             //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
                             //                        mylog("回去")
                         }else{//pulling
                             mylog("上拉以刷新")
-                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling)
+                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling, scale: scale)
 //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
                         }
                     }
@@ -643,12 +775,25 @@ extension GDRefreshControl{
 //                        isNeedRefresh = true
                     }else{//左拉以刷新
                         mylog("左拉以刷新")
+                        
+                        var scale : CGFloat   = 0
+                        
+                        if contentOffset.x >=  0 && contentOffset.x <=  refreshHeight   {
+                            
+                            scale = contentOffset.x  / refreshHeight
+                            mylog(scale)
+                            
+                        }
+                        
+                        
+                        
+                        
                         if contentOffset.x  <= self.priviousContentOffset.x{//backing
-                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing)
+                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing , scale : scale )
                             //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
                             //                        mylog("回去")
                         }else{//pulling
-                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling)
+                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling , scale : scale )
 //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
                         }
                     }
@@ -662,12 +807,26 @@ extension GDRefreshControl{
 //                        isNeedRefresh = true
                     }else{//左拉以刷新
                         mylog("左拉以刷新")
+                        
+                        
+                        
+                        
+                        var scale : CGFloat   = 0
+                        
+                        if contentOffset.x <=  (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + refreshHeight && contentOffset.x >=  (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 )   {
+                            
+                            scale = (contentOffset.x - ((scrollView?.contentSize.width ?? 0)  - (scrollView?.bounds.size.width ?? 0 ) ) ) / refreshHeight
+                            mylog(scale)
+                            
+                        }
+
+                        
                         if contentOffset.x  <= self.priviousContentOffset.x{//backing
-                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing)
+                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing , scale : scale )
                             //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
                             //                        mylog("回去")
                         }else{//pulling
-                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling)
+                            self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling , scale : scale )
 //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
                         }
                     }

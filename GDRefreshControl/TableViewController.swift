@@ -8,21 +8,33 @@
 
 import UIKit
 class TableViewController: UITableViewController {
-    var rows  : Int = 13
+    
+    var rows  : Int = 1
     
     func dddddd()  {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
             
-            self.tableView.gdRefreshControl?.endRefresh(result: GDRefreshResult.networkError)
+            self.tableView.gdRefreshControl?.endRefresh(result: GDRefreshResult.failure)
         }
     }
     
     func load(/***/)  {
-//        self.rows = self.rows + 4
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+ 
+            if self.rows > 13 {
+                self.tableView.reloadData()
+                self.tableView.gdLoadControl?.endLoad(result: GDLoadResult.nomore)
+            }else{
+                self.rows = self.rows + 1
+                self.tableView.reloadData()
+                self.tableView.gdLoadControl?.endLoad(result: GDLoadResult.success)
+            }
+        }
+    
 //        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
         
-            self.tableView.reloadData()
-            self.tableView.gdLoadControl?.endLoad(result: GDLoadResult.nomore)
+//            self.tableView.reloadData()
+//            self.tableView.gdLoadControl?.endLoad(result: GDLoadResult.success)
 //        }
     }
     func testyyy() {
@@ -47,8 +59,9 @@ class TableViewController: UITableViewController {
         self.tableView.gdRefreshControl = refresh
         
         
-//        let load = GDLoadControl.init(target: self , selector: #selector(self.load))
-//        self.tableView.gdLoadControl = load
+        let load = GDLoadControl.init(target: self , selector: #selector(self.load))
+        load.direction = GDDirection.top
+        self.tableView.gdLoadControl = load
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         

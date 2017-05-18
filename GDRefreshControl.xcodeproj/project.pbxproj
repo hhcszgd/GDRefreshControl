@@ -19,6 +19,9 @@
 		15AD0AAF1EC557E100945A2B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15AD0AAD1EC557E100945A2B /* LaunchScreen.storyboard */; };
 		15AD0AC01EC55A9300945A2B /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AD0ABE1EC55A9300945A2B /* TableViewController.swift */; };
 		15AD0AC31EC55B8B00945A2B /* llll.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15AD0AC21EC55B8B00945A2B /* llll.storyboard */; };
+		15BB1B2F1ECD846600A62D83 /* Collection.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15BB1B2E1ECD846600A62D83 /* Collection.storyboard */; };
+		15BB1B311ECD84E000A62D83 /* CollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15BB1B301ECD84E000A62D83 /* CollectionViewController.swift */; };
+		15CC85C01ECC477500052BB9 /* Resource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 15CC85BF1ECC477500052BB9 /* Resource.bundle */; };
 		3AAB7929DF642991D9B4BFD9 /* Pods_GDRefreshControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C04447962067ED02E6DC684A /* Pods_GDRefreshControl.framework */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +40,9 @@
 		15AD0AB01EC557E100945A2B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		15AD0ABE1EC55A9300945A2B /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		15AD0AC21EC55B8B00945A2B /* llll.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = llll.storyboard; sourceTree = "<group>"; };
+		15BB1B2E1ECD846600A62D83 /* Collection.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Collection.storyboard; sourceTree = "<group>"; };
+		15BB1B301ECD84E000A62D83 /* CollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewController.swift; sourceTree = "<group>"; };
+		15CC85BF1ECC477500052BB9 /* Resource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Resource.bundle; sourceTree = "<group>"; };
 		C04447962067ED02E6DC684A /* Pods_GDRefreshControl.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GDRefreshControl.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB70376E28FE118138BEB6D0 /* Pods-GDRefreshControl.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GDRefreshControl.release.xcconfig"; path = "Pods/Target Support Files/Pods-GDRefreshControl/Pods-GDRefreshControl.release.xcconfig"; sourceTree = "<group>"; };
 		F97BAE80548AD89FCAE10289 /* Pods-GDRefreshControl.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GDRefreshControl.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GDRefreshControl/Pods-GDRefreshControl.debug.xcconfig"; sourceTree = "<group>"; };
@@ -57,6 +63,7 @@
 		156B99061EC94B0F00B1AB4B /* code */ = {
 			isa = PBXGroup;
 			children = (
+				15CC85BF1ECC477500052BB9 /* Resource.bundle */,
 				156967AD1EC9A0730038B7E5 /* pch.swift */,
 				1582FB431ECADE5A009A74B0 /* GDBaseControl.swift */,
 				156B99071EC94B4E00B1AB4B /* GDLoadControl.swift */,
@@ -91,6 +98,8 @@
 				15AD0AA61EC557E100945A2B /* ViewController.swift */,
 				156967AB1EC993970038B7E5 /* TableViewCell.swift */,
 				15AD0ABE1EC55A9300945A2B /* TableViewController.swift */,
+				15BB1B301ECD84E000A62D83 /* CollectionViewController.swift */,
+				15BB1B2E1ECD846600A62D83 /* Collection.storyboard */,
 				15AD0AC21EC55B8B00945A2B /* llll.storyboard */,
 				15AD0AA81EC557E100945A2B /* Main.storyboard */,
 				15AD0AAB1EC557E100945A2B /* Assets.xcassets */,
@@ -180,10 +189,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				15BB1B2F1ECD846600A62D83 /* Collection.storyboard in Resources */,
 				15AD0AC31EC55B8B00945A2B /* llll.storyboard in Resources */,
 				15AD0AAF1EC557E100945A2B /* LaunchScreen.storyboard in Resources */,
 				15AD0AAC1EC557E100945A2B /* Assets.xcassets in Resources */,
 				15AD0AAA1EC557E100945A2B /* Main.storyboard in Resources */,
+				15CC85C01ECC477500052BB9 /* Resource.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,6 +253,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				15BB1B311ECD84E000A62D83 /* CollectionViewController.swift in Sources */,
 				156B990A1EC94B4E00B1AB4B /* GDRefreshControl.swift in Sources */,
 				156B99091EC94B4E00B1AB4B /* GDLoadControl.swift in Sources */,
 				15AD0AC01EC55A9300945A2B /* TableViewController.swift in Sources */,

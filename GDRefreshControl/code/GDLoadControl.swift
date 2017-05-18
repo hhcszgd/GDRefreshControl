@@ -41,10 +41,40 @@ public enum GDLoadStatus {
 }
 
 public class GDLoadControl: GDBaseControl {
-    public var loadHeight : CGFloat = 60
+    public var loadHeight : CGFloat = 64
+    public var pullingImages : [UIImage] = pullingImgsForLoad(){
+        didSet{
+        }
+    }
+    public var loadingImages : [UIImage] = loadingImgs(){
+        didSet{
+            
+        }
+    }
     
+    public var networkErrorImage : UIImage = networkErrorImageForLoad(){
+        didSet{
+            
+        }
+    }
+    
+    public var successImage : UIImage = successImagesForLoad(){
+        didSet{
+            
+        }
+    }
+    
+    public var failureImage : UIImage = failureImagesForLoad(){
+        didSet{
+            
+        }
+    }
+    public var nomoreImage : UIImage = nomoreImageForLoad(){
+        didSet{
+            
+        }
+    }
     var priviousFrame : CGRect = CGRect.zero
-    
     var showStatus = GDLoadShowStatus.idle
     
     
@@ -120,8 +150,6 @@ public class GDLoadControl: GDBaseControl {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = UIColor.orange
-        self.addSubview(self.titleLabel)
         self.titleLabel.textAlignment = NSTextAlignment.center
         self.titleLabel.numberOfLines = 0
     }
@@ -166,6 +194,9 @@ extension GDLoadControl {
         }
     }
     
+    /// call after reloadData(tableView)
+    ///
+    /// - Parameter result:  forExample : success , networkError , nomore
     public func endLoad(result : GDLoadResult = GDLoadResult.success)  {
         mylog(Thread.current)
         if  self.loadStatus == GDLoadStatus.loading {
@@ -211,32 +242,53 @@ extension GDLoadControl {
     
     
     
-    func updateTextAndImage(showStatus : GDLoadShowStatus , actionType : GDLoadShowStatus = GDLoadShowStatus.pulling/*拖动中还是弹回中*/,contentOffset : CGPoint = CGPoint.zero)  {
+    func updateTextAndImage(showStatus : GDLoadShowStatus , actionType : GDLoadShowStatus = GDLoadShowStatus.pulling/*拖动中还是弹回中*/,scale : CGFloat = 0.0)  {
+        if self.imageView.isAnimating {
+            self.imageView.stopAnimating()
+        }
         var title  = ""
         
         if showStatus == GDLoadShowStatus.pulling && actionType == GDLoadShowStatus.pulling {
             //下拉以加载
             title = "拖动以加载"
+            let a : Int =  Int(( CGFloat( self.pullingImages.count) * scale))
+            if a > 0 && a < self.pullingImages.count {
+                self.imageView.image = self.pullingImages[a]
+                
+            }
         }else if showStatus == GDLoadShowStatus.pulling && actionType == GDLoadShowStatus.backing && self.loadStatus != GDLoadStatus.loading{
             //下拉以加载
             title = "拖动以加载"
+            let a : Int =  Int(( CGFloat( self.pullingImages.count) * scale))
+            if a > 0 && a < self.pullingImages.count {
+                self.imageView.image = self.pullingImages[a]
+                
+            }
         }else if showStatus == GDLoadShowStatus.prepareLoading  {
             title = "松手加载"
             //松手以加载
         }else if showStatus == GDLoadShowStatus.loading && actionType == GDLoadShowStatus.loading{
             title = "加载中"
+            self.imageView.animationImages = self.loadingImages
+            self.imageView.animationDuration = 0.5
+            self.imageView.animationRepeatCount = 19
+            self.imageView.startAnimating()
             //加载中
         }else if showStatus ==  GDLoadShowStatus.loadSuccess && actionType == GDLoadShowStatus.loaded{
             title = "加载成功"
+            self.imageView.image = self.successImage
             //加载成功
         }else if showStatus ==  GDLoadShowStatus.loadFailure && actionType == GDLoadShowStatus.loaded{
             title = "加载失败"
+            self.imageView.image = self.failureImage
             //加载失败
         }else if showStatus ==  GDLoadShowStatus.netWorkError && actionType == GDLoadShowStatus.loaded{
             title = "网络错误"
+            self.imageView.image = self.networkErrorImage
             //网络错误
         }else if showStatus ==  GDLoadShowStatus.nomore && actionType == GDLoadShowStatus.loaded{
             title = "没有更多数据"
+            self.imageView.image = self.nomoreImage
             //网络错误
         }
         
@@ -260,12 +312,32 @@ extension GDLoadControl {
         switch self.direction {
         case  GDDirection.top:
             self.frame = CGRect(x: 0, y: -loadHeight, width: scrollView.bounds.size.width, height: loadHeight)
-            self.titleLabel.frame = CGRect(x: 0, y: self.bounds.size.height - self.titleLabel.font.lineHeight, width: self.bounds.size.width, height: self.titleLabel.font.lineHeight)
+            if self.labelFrame == CGRect.zero {
+                self.titleLabel.frame = CGRect(x: 10, y: self.bounds.size.height * 0.4, width: self.bounds.size.width, height: self.titleLabel.font.lineHeight)
+            }else{
+                self.titleLabel.frame = self.labelFrame
+            }
+            if self.imageViewFrame == CGRect.zero {
+                self.imageView.frame = CGRect(x: 10, y: self.bounds.size.height * 0.1, width: self.bounds.size.height * 0.8, height: self.bounds.size.height * 0.8)
+            }else{
+                self.imageView.frame = self.imageViewFrame
+            }
             
             break
         case  GDDirection.left:
             self.frame = CGRect(x: -loadHeight, y: 0, width: loadHeight, height: scrollView.bounds.size.height)
-            self.titleLabel.frame = CGRect(x: self.bounds.size.width - self.titleLabel.font.lineHeight, y: 0, width: self.titleLabel.font.lineHeight, height: self.bounds.size.height)
+            if self.labelFrame == CGRect.zero {
+                self.titleLabel.frame = CGRect(x: self.bounds.size.width * 0.5, y: 0, width: self.titleLabel.font.lineHeight, height: self.bounds.size.height)
+            }else{
+                self.titleLabel.frame = self.labelFrame
+            }
+            
+            if self.imageViewFrame == CGRect.zero {
+                self.imageView.frame = CGRect(x: self.bounds.size.width * 0.1, y: 10, width: self.bounds.size.width * 0.8, height: self.bounds.size.width * 0.8)
+            }else{
+                self.imageView.frame = self.imageViewFrame
+            }
+            
             break
         case  GDDirection.bottom:
             
@@ -274,7 +346,18 @@ extension GDLoadControl {
             }else{
                 self.frame = CGRect(x: 0, y: scrollView.contentSize.height , width:scrollView.bounds.size.width  ,  height: loadHeight)
             }
-            self.titleLabel.frame = CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.titleLabel.font.lineHeight)
+            if self.labelFrame == CGRect.zero {
+            
+                self.titleLabel.frame = CGRect(x: 0, y: self.bounds.size.height * 0.4, width: self.bounds.size.width, height: self.titleLabel.font.lineHeight)
+            }else{
+                self.titleLabel.frame = self.labelFrame
+            }
+            if self.imageViewFrame == CGRect.zero {
+                
+                self.imageView.frame = CGRect(x: 10, y: self.bounds.size.height * 0.2, width: self.bounds.size.height * 0.8, height: self.bounds.size.height * 0.8)
+            }else{
+                self.imageView.frame = self.imageViewFrame
+            }
             break
         case  GDDirection.right:
             
@@ -284,7 +367,18 @@ extension GDLoadControl {
                 
                 self.frame = CGRect(x: scrollView.contentSize.width, y: 0, width: loadHeight, height: scrollView.bounds.size.height)
             }
-            self.titleLabel.frame = CGRect(x: self.titleLabel.font.lineHeight, y: 0, width: self.titleLabel.font.lineHeight, height: self.bounds.size.height)
+            if self.labelFrame == CGRect.zero {
+                self.titleLabel.frame = CGRect(x: self.titleLabel.font.lineHeight, y: 0, width: self.titleLabel.font.lineHeight, height: self.bounds.size.height)
+            }else{
+                self.titleLabel.frame = self.labelFrame
+            }
+            
+            if self.imageViewFrame == CGRect.zero{
+                self.imageView.frame = CGRect(x: self.bounds.size.width * 0.1, y: 10, width: self.bounds.size.width * 0.8, height: self.bounds.size.width * 0.8)
+            }else{
+                self.imageView.frame = self.imageViewFrame
+            }
+            
             break
         }
         
@@ -402,7 +496,6 @@ extension GDLoadControl {
     public override  func scrollViewDidEndDragging(_ scrollView: UIScrollView){
         mylog("松手了  ,当前偏移量是\(scrollView.contentOffset)")
 
-        self.backgroundColor = UIColor.orange
         if self.loadStatus != GDLoadStatus.loading {
             self.setrefershStatusEndDrag(contentOffset: scrollView.contentOffset)
             
@@ -585,14 +678,24 @@ extension GDLoadControl {
 //        mylog(self.scrollView?.contentOffset)
         switch self.direction {
         case  GDDirection.top:
+            var scale : CGFloat   = 0
+            
+            if contentOffset.y <=  0 && contentOffset.y >=  -loadHeight   {
+                
+                scale = -contentOffset.y  / loadHeight
+                mylog(scale)
+                
+            }
+            
+            
             if contentOffset.y < -loadHeight {//可以加载
 //                inset.top = self.loadHeight
                 self.updateTextAndImage(showStatus: GDLoadShowStatus.prepareLoading)
             }else{//下拉以加载
                 if contentOffset.y  >= self.priviousContentOffset.y{//backing
-                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing)
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing, scale: scale)
                 }else{//pulling
-                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling)
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale: scale)
                 }
             }
             
@@ -602,13 +705,26 @@ extension GDLoadControl {
 //                inset.left = self.loadHeight
                 self.updateTextAndImage(showStatus: GDLoadShowStatus.prepareLoading)
             }else{//右拉以加载
-                //                    self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                //  self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                
+                
+                var scale : CGFloat   = 0
+                
+                if contentOffset.x <=  0 && contentOffset.x >=  -loadHeight   {
+                    
+                    scale = -contentOffset.x  / loadHeight
+                    mylog(scale)
+                    
+                }
+                
+
+                
                 if contentOffset.x  >= self.priviousContentOffset.x{//backing
-                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing)
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing , scale:  scale)
                     //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
                     //                        mylog("回去")
                 }else{//pulling
-                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling)
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale:  scale)
                 }
             }
             break
@@ -620,31 +736,51 @@ extension GDLoadControl {
 //                    mylog("松手可加载")
 //                    inset.bottom = self.loadHeight + ((scrollView?.bounds.size.height ?? 0) - (scrollView?.contentSize.height ?? 0))
                 }else{//上拉以加载
+                    
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.y >=  0 && contentOffset.y <=  loadHeight   {
+                        
+                        scale = contentOffset.y  / loadHeight
+                        mylog(scale)
+                        
+                    }
+                    
+                    
+                    
                     if contentOffset.y  <= self.priviousContentOffset.y{//backing
-                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing)
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing , scale : scale )
                         //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
                         //                        mylog("回去")
                     }else{//pulling
-                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling)
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale : scale )
                         //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
 //                        mylog("上拉以加载")
                     }
                 }
             }else{
-                if contentOffset.y >= self.frame.origin.y  - (scrollView?.bounds.size.height ?? 0 ) && contentOffset.y < (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ){//调整一下刷新控件的frame
-                }
+               
                 if contentOffset.y > (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + loadHeight {//可以加载
                     self.updateTextAndImage(showStatus: GDLoadShowStatus.prepareLoading)
 //                    mylog("松手可加载")
 //                    inset.bottom = self.loadHeight
                 }else{//上拉以加载
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.y <=  (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + loadHeight && contentOffset.y >=  (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 )   {
+                        
+                         scale = (contentOffset.y - ((scrollView?.contentSize.height ?? 0)  - (scrollView?.bounds.size.height ?? 0 ) ) ) / loadHeight
+                        mylog(scale)
+                        
+                    }
+                    
                     if contentOffset.y  <= self.priviousContentOffset.y{//backing
-                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing)
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing , scale : scale )
                         //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
                         //                        mylog("回去")
                     }else{//pulling
 //                        mylog("上拉以加载")
-                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling)
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale : scale )
                         //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
                     }
                 }
@@ -658,12 +794,24 @@ extension GDLoadControl {
 //                    inset.right = self.loadHeight + ((scrollView?.bounds.size.width ?? 0) - (scrollView?.contentSize.width ?? 0))
                 }else{//左拉以加载
 //                    mylog("左拉以加载")
+                    
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.x >=  0 && contentOffset.x <=  loadHeight   {
+                        
+                        scale = contentOffset.x  / loadHeight
+                        mylog(scale)
+                        
+                    }
+                    
+                    
+                    
                     if contentOffset.x  <= self.priviousContentOffset.x{//backing
-                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing)
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing , scale : scale )
                         //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
                         //                        mylog("回去")
                     }else{//pulling
-                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling)
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale : scale )
                         //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
                     }
                 }
@@ -674,12 +822,25 @@ extension GDLoadControl {
 //                    inset.right = self.loadHeight
                 }else{//左拉以加载
 //                    mylog("左拉以加载")
+                    
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.x <=  (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + loadHeight && contentOffset.x >=  (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 )   {
+                        
+                        scale = (contentOffset.x - ((scrollView?.contentSize.width ?? 0)  - (scrollView?.bounds.size.width ?? 0 ) ) ) / loadHeight
+                        mylog(scale)
+                        
+                    }
+                    
+
+                    
+                    
                     if contentOffset.x  <= self.priviousContentOffset.x{//backing
-                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing)
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing , scale : scale )
                         //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
                         //                        mylog("回去")
                     }else{//pulling
-                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling)
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale : scale )
                         //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
                     }
                 }
