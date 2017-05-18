@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "GDRefreshControl"
-  s.version      = "0.0.83"
+  s.version      = "0.0.84"
   s.summary      = "This is for pull refresh"
 
   # This description is used to generate tags and improve search results.
@@ -80,7 +80,7 @@ s.license      = { :type => "MIT", :file => "LICENSE" }
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/hhcszgd/GDRefreshControl.git", :tag => "0.0.83" }
+  s.source       = { :git => "https://github.com/hhcszgd/GDRefreshControl.git", :tag => "0.0.84" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -92,7 +92,7 @@ s.license      = { :type => "MIT", :file => "LICENSE" }
   #
 
 #s.source_files  = "GDRefreshControl", "GDRefreshControl/code/*.swift"
-s.source_files  = "GDRefreshControl/code/*.swift"
+s.source_files  = "GDRefreshControl/code/*.bundle", "GDRefreshControl/code/*.swift"
 
   s.exclude_files = "Classes/Exclude"
 
