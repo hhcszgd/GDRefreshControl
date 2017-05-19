@@ -80,7 +80,12 @@ public class GDRefreshControl: GDBaseControl {
         }
     }
 
-    
+    public var pullingStr = "拖动以刷新"
+    public var loosenStr = "松开刷新"
+    public var refreshingStr = "刷新中"
+    public var successStr = "加载成功"
+    public var failureStr = "加载失败"
+    public var networkErrorStr = "网络错误"
     
     var showStatus = GDShowStatus.idle
     
@@ -251,7 +256,7 @@ extension GDRefreshControl {
         }
         if showStatus == GDShowStatus.pulling && actionType == GDShowStatus.pulling {
             //下拉以加载
-            title = "拖动以刷新"
+            title = pullingStr
             let a : Int =  Int(( CGFloat( self.pullingImages.count) * scale))
             if a > 0 && a < self.pullingImages.count {
                 self.imageView.image = self.pullingImages[a]
@@ -259,32 +264,32 @@ extension GDRefreshControl {
             }
         }else if showStatus == GDShowStatus.pulling && actionType == GDShowStatus.backing && self.refreshStatus != GDRefreshStatus.refreshing{
             //下拉以加载
-            title = "拖动以刷新"
+            title = pullingStr
             let a : Int =  Int(( CGFloat( self.pullingImages.count) * scale))
             if a > 0 && a < self.pullingImages.count {
                 self.imageView.image = self.pullingImages[a]
                 
             }
         }else if showStatus == GDShowStatus.prepareRefreshing  {
-            title = "松手刷新"
+            title = loosenStr
             //松手以刷新
         }else if showStatus == GDShowStatus.refreshing && actionType == GDShowStatus.refreshing{
-            title = "刷新中"
+            title = refreshingStr
             self.imageView.animationImages = self.refreshingImages
             self.imageView.animationDuration = 0.5
             self.imageView.animationRepeatCount = 19
             self.imageView.startAnimating()
             //刷新中
         }else if showStatus ==  GDShowStatus.refreshSuccess && actionType == GDShowStatus.refreshed{
-            title = "刷新成功"
+            title = successStr
             self.imageView.image = self.successImage
             //刷新成功
         }else if showStatus ==  GDShowStatus.refreshFailure && actionType == GDShowStatus.refreshed{
-            title = "刷新失败"
+            title = failureStr
             self.imageView.image = self.failureImage
             //刷新失败
         }else if showStatus ==  GDShowStatus.netWorkError && actionType == GDShowStatus.refreshed{
-            title = "网络错误"
+            title = networkErrorStr
             self.imageView.image = self.networkErrorImage
             //网络错误
         }
@@ -380,79 +385,9 @@ extension GDRefreshControl {
     
 }
 
+
+
 // MARK: 注释 : KVO
-extension GDRefreshControl {
-    
-    
-    
-//    override public func willMove(toSuperview newSuperview: UIView?) {//important
-//        super.willMove(toSuperview: newSuperview)
-//        if newSuperview == nil  {//将要从tableView上移除之前(提前与deinit),先移除scrollView的contentOffset的监听 , 否则会崩溃
-////            if let scrollView = self.superview as? UIScrollView {
-////                scrollView.removeObserver(self , forKeyPath: "contentOffset")
-////            }
-//        }else{
-//            if let scrollView = newSuperview as? UIScrollView {
-//                self.scrollView = scrollView
-//                self.originalIspagingEnable = scrollView.isPagingEnabled
-//                self.originalContentInset = scrollView.contentInset
-//                self.originalContentOffset = scrollView.contentOffset
-//                mylog("最初赋值时 , 滚动控件的滚动范围\(scrollView.contentSize)")
-//                self.fixFrame(scrollView: scrollView)
-////                scrollView.delegate = self//监听contentOffset改用代理的形式
-////                scrollView.addObserver(self , forKeyPath: "contentOffset", options: NSKeyValueObservingOptions.new, context: nil)
-//            }
-//        }
-//    }
-//
-//    override public func layoutSubviews() {
-//        super.layoutSubviews()
-//        if let scrollView = self.scrollView {
-//            self.scrollView = scrollView
-//            self.originalIspagingEnable = scrollView.isPagingEnabled
-//            self.originalContentInset = scrollView.contentInset
-//            self.originalContentOffset = scrollView.contentOffset
-////            mylog("最初赋值时 , 滚动控件的滚动范围\(scrollView.contentSize)")//此时的contentSize才有值
-//            self.fixFrame(scrollView: scrollView)
-////            scrollView.delegate = self//监听contentOffset改用代理的形式
-//            //                scrollView.addObserver(self , forKeyPath: "contentOffset", options: NSKeyValueObservingOptions.new, context: nil)
-//        }
-//        
-//        if let collection  = self.scrollView as? UICollectionView {//保证Collection的滚动
-//            if let flowLayout  = collection.collectionViewLayout as? UICollectionViewFlowLayout {
-//                if flowLayout.scrollDirection == UICollectionViewScrollDirection.horizontal {
-//                    collection.bounces = true
-//                    collection.alwaysBounceVertical = false
-//                    collection.alwaysBounceHorizontal = true
-//                }else if flowLayout.scrollDirection == UICollectionViewScrollDirection.vertical {
-//                    collection.bounces = true
-//                    collection.alwaysBounceVertical = true
-//                    collection.alwaysBounceHorizontal = false
-//                }
-//                
-//                
-//            }
-//        }
-//    }
-//
-//    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-//        
-//        if keyPath != nil && keyPath! == "contentOffset" {
-////            if let newPoint = change?[NSKeyValueChangeKey.newKey] as? CGPoint{
-////                //                mylog(newPoint)//下拉变小
-////                //                self.prepareRefresh(contentOffset: newPoint)
-////            }
-//        }else{
-//            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-//        }
-//    }
-    
-    
-}
-
-
-
-// MARK: 注释 : UIScrollViewDelegate
 extension GDRefreshControl{
     
 
@@ -495,7 +430,7 @@ extension GDRefreshControl{
         var isNeedRefresh = false
         
         
-        //TODO  抽出目标contentOffset 分别赋值 , 再在底部动画与contentInset一起赋值(目前问题 , 达到刷新条件后 ,松手会偶尔出现滚动视图乱跳)
+        
         var tempContentOffset  = CGPoint.zero
         
         switch self.direction {
@@ -503,8 +438,6 @@ extension GDRefreshControl{
             if contentOffset.y < -refreshHeight {//可以刷新
                 inset.top = self.refreshHeight
                 isNeedRefresh = true
-//                let contentOffset = CGPoint(x: 0, y: 0)
-//                self.scrollView?.setContentOffset(contentOffset, animated: true )
                 tempContentOffset.y = -refreshHeight
             }
             
@@ -514,7 +447,6 @@ extension GDRefreshControl{
                 inset.left = self.refreshHeight
                 isNeedRefresh = true
                 tempContentOffset.x = -refreshHeight
-//                self.scrollView?.setContentOffset(CGPoint.zero, animated: true )
             }
             break
         case  GDDirection.bottom:

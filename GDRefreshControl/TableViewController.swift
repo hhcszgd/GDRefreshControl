@@ -11,7 +11,7 @@ class TableViewController: UITableViewController {
     
     var rows  : Int = 1
     
-    func dddddd()  {
+    func refresh()  {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
             
             self.tableView.gdRefreshControl?.endRefresh(result: GDRefreshResult.failure)
@@ -37,7 +37,7 @@ class TableViewController: UITableViewController {
 //            self.tableView.gdLoadControl?.endLoad(result: GDLoadResult.success)
 //        }
     }
-    func testyyy() {
+    func testProperty() {
         var count: UInt32 = 3
         let objc_property_tS = class_copyPropertyList(UIScrollView.self  , &count)
         for i in 0 ..< count {
@@ -50,17 +50,18 @@ class TableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         print(UIDevice.current.systemVersion)
-        self.testyyy()
         self.tableView.rowHeight = UITableViewAutomaticDimension
         self.tableView.estimatedRowHeight = 100
 //        self.tableView.rowHeight = 99
-        let refresh = GDRefreshControl.init(target: self , selector: #selector(dddddd))
+        let refresh = GDRefreshControl.init(target: self , selector: #selector(self.refresh))
         refresh.direction = GDDirection.bottom
+//        refresh.pullingStr  = "阿利亚多"
         self.tableView.gdRefreshControl = refresh
         
         
         let load = GDLoadControl.init(target: self , selector: #selector(self.load))
         load.direction = GDDirection.top
+//        load.pullingStr = "thank you "
         self.tableView.gdLoadControl = load
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false

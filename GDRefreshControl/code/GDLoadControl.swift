@@ -74,6 +74,29 @@ public class GDLoadControl: GDBaseControl {
             
         }
     }
+    public var pullingStr = "拖动以刷新"
+    public var loosenStr = "松开刷新"
+    public var loadingStr = "刷新中"
+    public var successStr = "加载成功"
+    public var failureStr = "加载失败"
+    public var networkErrorStr = "网络错误"
+    public var nomoreStr = "没有更多数据"
+    /**
+     
+     title = "加载成功"
+     self.imageView.image = self.successImage
+     //加载成功
+     }else if showStatus ==  GDLoadShowStatus.loadFailure && actionType == GDLoadShowStatus.loaded{
+     title = "加载失败"
+     self.imageView.image = self.failureImage
+     //加载失败
+     }else if showStatus ==  GDLoadShowStatus.netWorkError && actionType == GDLoadShowStatus.loaded{
+     title = "网络错误"
+     self.imageView.image = self.networkErrorImage
+     //网络错误
+     }else if showStatus ==  GDLoadShowStatus.nomore && actionType == GDLoadShowStatus.loaded{
+     title = "没有更多数据"
+     */
     var priviousFrame : CGRect = CGRect.zero
     var showStatus = GDLoadShowStatus.idle
     
@@ -250,7 +273,7 @@ extension GDLoadControl {
         
         if showStatus == GDLoadShowStatus.pulling && actionType == GDLoadShowStatus.pulling {
             //下拉以加载
-            title = "拖动以加载"
+            title = pullingStr
             let a : Int =  Int(( CGFloat( self.pullingImages.count) * scale))
             if a > 0 && a < self.pullingImages.count {
                 self.imageView.image = self.pullingImages[a]
@@ -258,36 +281,36 @@ extension GDLoadControl {
             }
         }else if showStatus == GDLoadShowStatus.pulling && actionType == GDLoadShowStatus.backing && self.loadStatus != GDLoadStatus.loading{
             //下拉以加载
-            title = "拖动以加载"
+            title = pullingStr
             let a : Int =  Int(( CGFloat( self.pullingImages.count) * scale))
             if a > 0 && a < self.pullingImages.count {
                 self.imageView.image = self.pullingImages[a]
                 
             }
         }else if showStatus == GDLoadShowStatus.prepareLoading  {
-            title = "松手加载"
+            title = loosenStr
             //松手以加载
         }else if showStatus == GDLoadShowStatus.loading && actionType == GDLoadShowStatus.loading{
-            title = "加载中"
+            title = loadingStr
             self.imageView.animationImages = self.loadingImages
             self.imageView.animationDuration = 0.5
             self.imageView.animationRepeatCount = 19
             self.imageView.startAnimating()
             //加载中
         }else if showStatus ==  GDLoadShowStatus.loadSuccess && actionType == GDLoadShowStatus.loaded{
-            title = "加载成功"
+            title = successStr
             self.imageView.image = self.successImage
             //加载成功
         }else if showStatus ==  GDLoadShowStatus.loadFailure && actionType == GDLoadShowStatus.loaded{
-            title = "加载失败"
+            title = failureStr
             self.imageView.image = self.failureImage
             //加载失败
         }else if showStatus ==  GDLoadShowStatus.netWorkError && actionType == GDLoadShowStatus.loaded{
-            title = "网络错误"
+            title = networkErrorStr
             self.imageView.image = self.networkErrorImage
             //网络错误
         }else if showStatus ==  GDLoadShowStatus.nomore && actionType == GDLoadShowStatus.loaded{
-            title = "没有更多数据"
+            title = nomoreStr
             self.imageView.image = self.nomoreImage
             //网络错误
         }
