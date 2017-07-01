@@ -52,16 +52,16 @@ class TableViewController: UITableViewController {
         print(UIDevice.current.systemVersion)
         self.tableView.rowHeight = UITableViewAutomaticDimension
         self.tableView.estimatedRowHeight = 100
-        self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0    )
+        self.tableView.contentInset = UIEdgeInsets(top: 88, left: 0, bottom: 0, right: 0    )
 //        self.tableView.rowHeight = 99
         let refresh = GDRefreshControl.init(target: self , selector: #selector(self.refresh))
-//        refresh.direction = GDDirection.bottom
+        refresh.direction = GDDirection.bottom
 //        refresh.pullingStr  = "阿利亚多"
         self.tableView.gdRefreshControl = refresh
         
         
         let load = GDLoadControl.init(target: self , selector: #selector(self.load))
-//        load.direction = GDDirection.top
+        load.direction = GDDirection.top
 //        load.pullingStr = "thank you "
         self.tableView.gdLoadControl = load
         // Uncomment the following line to preserve selection between presentations

@@ -157,7 +157,7 @@ extension GDBaseControl {
         
 //        mylog(keyPath)
         if keyPath != nil && keyPath! == "contentOffset" {
-            if let newPoint = change?[NSKeyValueChangeKey.newKey] as? CGPoint{
+            if let _ = change?[NSKeyValueChangeKey.newKey] as? CGPoint{
                 //                mylog("监听contentOffset\(newPoint)")//下拉变小
                 if let scrollView = self.scrollView {
                     self.scrollViewDidScroll(scrollView)
@@ -170,7 +170,7 @@ extension GDBaseControl {
             
             
         }else if keyPath != nil && keyPath! == "contentSize"{
-            let newPoint = change?[NSKeyValueChangeKey.newKey]
+            let _ = change?[NSKeyValueChangeKey.newKey]
             self.scrollViewContentSizeChanged()
             
         }else if keyPath != nil && keyPath! == "state"{

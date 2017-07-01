@@ -74,9 +74,9 @@ public class GDLoadControl: GDBaseControl {
             
         }
     }
-    public var pullingStr = "拖动以刷新"
-    public var loosenStr = "松开刷新"
-    public var loadingStr = "刷新中"
+    public var pullingStr = "拖动以加载"
+    public var loosenStr = "松开加载"
+    public var loadingStr = "加载中"
     public var successStr = "加载成功"
     public var failureStr = "加载失败"
     public var networkErrorStr = "网络错误"
@@ -112,7 +112,7 @@ public class GDLoadControl: GDBaseControl {
             
             switch self.direction {
             case  GDDirection.top:
-                let y = -loadHeight - 1.0
+                let y =  -(loadHeight + originalContentInset.top) - 1.0 // 减 1 是为了满足触发刷新的条件
                 //                self.setrefershStatusEndDrag(contentOffset:CGPoint(x: 0, y: y) )
                 self.performLoadAfterSetLoadingStatus(contentOffset: CGPoint(x: 0, y: y))
                 //                if (self.scrollView?.contentOffset.y ?? 0) < -loadHeight {//可以加载
@@ -208,8 +208,8 @@ extension GDLoadControl {
     
     func performLoad()  {//避免重复加载
 //        mylog("开始加载  偏移量\(String(describing: self.scrollView?.contentOffset))")
-        mylog("开始加载 frame \(String(describing: self.frame))")
-        mylog("contentOffset : \(self.scrollView?.contentOffset))")
+//        mylog("开始加载 frame \(String(describing: self.frame))")
+//        mylog("contentOffset : String(describing: \(self.scrollView?.contentOffs)et))")
         self.updateTextAndImage(showStatus: GDLoadShowStatus.loading , actionType: GDLoadShowStatus.loading)
         mylog(scrollView?.contentInset)
         if self.loadAction != nil && self.loadTarget != nil {
@@ -224,7 +224,7 @@ extension GDLoadControl {
         mylog(Thread.current)
         if  self.loadStatus == GDLoadStatus.loading {
             mylog("结束加载 frame \(String(describing: self.frame))")
-            mylog("contentOffset : \(self.scrollView?.contentOffset))")
+//            mylog("contentOffset : String(describing: \(self.scrollView?.contentOffs)et))")
             if result == GDLoadResult.success {
                 self.updateTextAndImage(showStatus: GDLoadShowStatus.loadSuccess , actionType:  GDLoadShowStatus.loaded)
             }else if result == GDLoadResult.failure{
@@ -236,20 +236,22 @@ extension GDLoadControl {
             }
             
             if result == GDLoadResult.success {
-                self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+//                self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+                self.scrollView?.contentInset = originalContentInset
                 self.loadStatus = GDLoadStatus.idle
             }else{
                 UIView.animate(withDuration: 0.2, delay: 0.5, options: UIViewAnimationOptions.curveEaseInOut, animations: {
 //                    mylog(Thread.current )
-                    self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+//                    self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+                    self.scrollView?.contentInset = self.originalContentInset
                 }) { (bool) in
                     if result == GDLoadResult.nomore {
                         self.loadStatus = GDLoadStatus.nomore
                     }else{
                         self.loadStatus = GDLoadStatus.idle
                     }
-                    mylog("加载完成 frame \(String(describing: self.frame))")
-                    mylog("contentOffset : \(self.scrollView?.contentOffset))")
+//                    mylog("加载完成 frame \(String(describing: self.frame))")
+//                    mylog("contentOffset : String(describing: \(self.scrollView?.contentOffs)et))")
                 }
             }
 
@@ -546,12 +548,12 @@ extension GDLoadControl {
         
         switch self.direction {
         case  GDDirection.top:
-            if contentOffset.y < -loadHeight {//可以加载
-                inset.top = self.loadHeight
+            if contentOffset.y < -(loadHeight + originalContentInset.top) {//可以加载
+                inset.top = self.loadHeight + originalContentInset.top
                 isNeedLoad = true
                 //                let contentOffset = CGPoint(x: 0, y: 0)
                 //                self.scrollView?.setContentOffset(contentOffset, animated: true )
-                tempContentOffset.y = -loadHeight
+                tempContentOffset.y = -(loadHeight + originalContentInset.top)
             }
             
             break
@@ -628,7 +630,7 @@ extension GDLoadControl {
         }
         switch self.direction {
         case  GDDirection.top:
-            if contentOffset.y < -loadHeight {//可以加载
+            if contentOffset.y <  -(loadHeight + originalContentInset.top) {//可以加载
                 if self.loadStatus != GDLoadStatus.loading {
                     self.loadStatus = .loading
                     return
@@ -703,15 +705,15 @@ extension GDLoadControl {
         case  GDDirection.top:
             var scale : CGFloat   = 0
             
-            if contentOffset.y <=  0 && contentOffset.y >=  -loadHeight   {
+            if contentOffset.y <=  -originalContentInset.top && contentOffset.y >=  -(loadHeight + originalContentInset.top)    {
                 
-                scale = -contentOffset.y  / loadHeight
+                scale = (-contentOffset.y - originalContentInset.top)  / loadHeight
                 mylog(scale)
                 
             }
             
             
-            if contentOffset.y < -loadHeight {//可以加载
+            if contentOffset.y < -(loadHeight + originalContentInset.top) {//可以加载
 //                inset.top = self.loadHeight
                 self.updateTextAndImage(showStatus: GDLoadShowStatus.prepareLoading)
             }else{//下拉以加载
