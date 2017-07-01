@@ -45,12 +45,12 @@ class CollectionViewController: UICollectionViewController {
             flowLayout.scrollDirection = UICollectionViewScrollDirection.horizontal
         }
         let refresh = GDRefreshControl.init(target: self , selector: #selector(dddddd))
-        refresh.direction = GDDirection.right
+//        refresh.direction = GDDirection.right
         self.collectionView?.gdRefreshControl = refresh
         
         
         let load = GDLoadControl.init(target: self , selector: #selector(self.load))
-        load.direction = GDDirection.left
+//        load.direction = GDDirection.left
         self.collectionView?.gdLoadControl = load
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false

@@ -101,7 +101,7 @@ public class GDRefreshControl: GDBaseControl {
             
             switch self.direction {
             case  GDDirection.top:
-                let y = -refreshHeight - 1.0
+                let y = -(refreshHeight + originalContentInset.top) - 1.0 // 减 1 是为了满足触发刷新的条件
 //                self.setrefershStatusEndDrag(contentOffset:CGPoint(x: 0, y: y) )
                 self.performRefreshAfterSetRefreshingStatus(contentOffset: CGPoint(x: 0, y: y))
 //                if (self.scrollView?.contentOffset.y ?? 0) < -refreshHeight {//可以刷新
@@ -226,12 +226,13 @@ extension GDRefreshControl {
             }
 
             if result == GDRefreshResult.success {
-                self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+                self.scrollView?.contentInset = originalContentInset
+//                self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)//不应该直接设置为0  , 应该记录原始contentInset , 刷新完毕以后重新把contentInset赋值回去
                 self.refreshStatus = GDRefreshStatus.idle
             }else{
                 UIView.animate(withDuration: 0.2, delay: 0.5, options: UIViewAnimationOptions.curveEaseInOut, animations: {
-                    self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
-
+//                    self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+                    self.scrollView?.contentInset = self.originalContentInset
                 }) { (bool) in
                     self.refreshStatus = GDRefreshStatus.idle
                 }
@@ -435,10 +436,10 @@ extension GDRefreshControl{
         
         switch self.direction {
         case  GDDirection.top:
-            if contentOffset.y < -refreshHeight {//可以刷新
-                inset.top = self.refreshHeight
+            if contentOffset.y < -(refreshHeight + originalContentInset.top) {//可以刷新
+                inset.top = self.refreshHeight + originalContentInset.top
                 isNeedRefresh = true
-                tempContentOffset.y = -refreshHeight
+                tempContentOffset.y = -(refreshHeight + originalContentInset.top)
             }
             
             break
@@ -490,8 +491,7 @@ extension GDRefreshControl{
         }
         if isNeedRefresh {
             // MARK: 注释 a: CollectionView的isPagingEnagle = true , 会影响contentInset的设置,不会发生预设的偏移 , 所以 , 设置contentInset之前, 设置为flase , 当用户拖动时再还原到用户设定的状态
-
-            UIView.animate(withDuration: 0.25, animations: { 
+            UIView.animate(withDuration: 0.25, animations: {
                 self.scrollView?.contentInset = inset
                 self.scrollView?.contentOffset = tempContentOffset
                 
@@ -512,7 +512,7 @@ extension GDRefreshControl{
     func setrefershStatusEndDrag(contentOffset: CGPoint )  {//原计划松手驱动 , for避免重复刷新 , 换成refreshing状态驱动
         switch self.direction {
         case  GDDirection.top:
-            if contentOffset.y < -refreshHeight {//可以刷新
+            if contentOffset.y < -(refreshHeight + originalContentInset.top) {//可以刷新one
                 if self.refreshStatus != GDRefreshStatus.refreshing {
                     self.refreshStatus = .refreshing
                     return
@@ -583,7 +583,8 @@ extension GDRefreshControl{
             return
         }
 //        mylog(self.frame)
-//        mylog(self.scrollView?.contentOffset)
+        mylog(self.scrollView?.contentOffset)
+        mylog(self.direction)
         var inset  = UIEdgeInsets.zero
 //        var isNeedRefresh = false
         switch self.direction {
@@ -591,16 +592,17 @@ extension GDRefreshControl{
                 
                 var scale : CGFloat   = 0
                 
-                if contentOffset.y <=  0 && contentOffset.y >=  -refreshHeight   {
+                if contentOffset.y <=  -originalContentInset.top && contentOffset.y >=  -(refreshHeight + originalContentInset.top)   {
                     
-                    scale = -contentOffset.y  / refreshHeight
+                    scale = (-contentOffset.y - originalContentInset.top)  / refreshHeight
                     mylog(scale)
                     
                 }
+                mylog(originalContentInset)
+                mylog(contentOffset)
                 
-                
-                if contentOffset.y < -refreshHeight {//可以刷新
-                    inset.top = self.refreshHeight
+                if contentOffset.y < -(refreshHeight + originalContentInset.top) {//可以刷新
+                    inset.top = (refreshHeight + originalContentInset.top)
 //                    isNeedRefresh = true
                     self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
                 }else{//下拉以刷新

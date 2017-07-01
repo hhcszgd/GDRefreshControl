@@ -105,7 +105,7 @@ extension GDBaseControl {
                 self.originalIspagingEnable = scrollView.isPagingEnabled
                 self.originalContentInset = scrollView.contentInset
                 self.originalContentOffset = scrollView.contentOffset
-                mylog("最初赋值时 , 滚动控件的滚动范围\(scrollView.contentSize)")
+                mylog("最初赋值时 , 滚动控件的contenInset\(scrollView.contentInset)")
                 self.addObservers(scrollView: scrollView)
             }
         }
