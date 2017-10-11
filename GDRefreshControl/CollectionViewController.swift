@@ -13,14 +13,14 @@ private let reuseIdentifier = "Cell"
 class CollectionViewController: UICollectionViewController {
     var rows  : Int = 1
     
-    func dddddd()  {
+    @objc func dddddd()  {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
             
             self.collectionView?.gdRefreshControl?.endRefresh(result: GDRefreshResult.failure)
         }
     }
     
-    func load(/***/)  {
+    @objc func load(/***/)  {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
             
             if self.rows > 13 {

@@ -90,8 +90,8 @@ public class GDRefreshControl: GDBaseControl {
     var showStatus = GDShowStatus.idle
     
     
-    fileprivate weak var refreshTarget : AnyObject?
-    fileprivate var refreshAction : Selector?
+    private weak var refreshTarget : AnyObject?
+    private var refreshAction : Selector?
     
     public var refreshStatus = GDRefreshStatus.idle{
         
@@ -179,6 +179,383 @@ public class GDRefreshControl: GDBaseControl {
     
     
 
+    public override func scrollViewContentSizeChanged(){
+        
+        if let scroll = self.scrollView {
+            mylog("监听contentSize : \(String(describing: scroll.contentSize))")
+            self.fixFrame(scrollView: scroll)//自动布局是 , scrollView的contentSize是动态变化的, 所以要实时调整加载控件的frame
+        }
+    }
+    
+    
+    
+    public override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        
+        // MARK: 注释 a: 当用户拖动时 , 还原滚动控件的isPagingEnable
+        if scrollView.isPagingEnabled != self.originalIspagingEnable {
+            self.scrollView?.isPagingEnabled = self.originalIspagingEnable
+        }
+        
+    }
+    
+    
+    public override func scrollViewDidEndDragging(_ scrollView: UIScrollView){
+        mylog("松手了  ,当前偏移量是\(scrollView.contentOffset)")
+        
+        if self.refreshStatus != GDRefreshStatus.refreshing {
+            self.setrefershStatusEndDrag(contentOffset: scrollView.contentOffset)
+            
+        }
+        
+    }
+    
+    
+    
+    
+    
+    func performRefreshAfterSetRefreshingStatus(contentOffset: CGPoint )  {//原计划松手驱动 , for避免重复刷新 , 换成refreshing状态驱动
+        var inset  = UIEdgeInsets.zero
+        var isNeedRefresh = false
+        
+        
+        
+        var tempContentOffset  = CGPoint.zero
+        
+        switch self.direction {
+        case  GDDirection.top:
+            if contentOffset.y < -(refreshHeight + originalContentInset.top) {//可以刷新
+                inset.top = self.refreshHeight + originalContentInset.top
+                isNeedRefresh = true
+                tempContentOffset.y = -(refreshHeight + originalContentInset.top)
+            }
+            
+            break
+        case  GDDirection.left:
+            if contentOffset.x < -refreshHeight {//可以刷新
+                inset.left = self.refreshHeight
+                isNeedRefresh = true
+                tempContentOffset.x = -refreshHeight
+            }
+            break
+        case  GDDirection.bottom:
+            
+            if (scrollView?.contentSize.height ?? 0) < (scrollView?.bounds.size.height ?? 0){//可滚动区域少于滚动控件frame
+                if contentOffset.y >  refreshHeight { //可以刷新
+                    inset.bottom = self.refreshHeight + ((scrollView?.bounds.size.height ?? 0) - (scrollView?.contentSize.height ?? 0))
+                    isNeedRefresh = true
+                    tempContentOffset.y = refreshHeight
+                    //                    self.scrollView?.setContentOffset(CGPoint(x: 0, y: self.refreshHeight), animated: true )//确保能执行刷新时,才调这句代码 . 否则会出现 偏移后不执行刷新
+                }
+            }else{
+                
+                if contentOffset.y > (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + refreshHeight {//可以刷新
+                    inset.bottom = self.refreshHeight
+                    isNeedRefresh = true
+                    tempContentOffset.y = (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0) + self.refreshHeight
+                    
+                    //                    self.scrollView?.setContentOffset(CGPoint(x: 0, y: (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0) + self.refreshHeight ), animated: true )//确保能执行刷新时,才调这句代码 . 否则会出现 偏移后不执行刷新
+                }
+            }
+            break
+        case  GDDirection.right:
+            if (scrollView?.contentSize.width ?? 0) < (scrollView?.bounds.size.width ?? 0){
+                if contentOffset.x >  refreshHeight {//可以刷新
+                    inset.right = self.refreshHeight + ((scrollView?.bounds.size.width ?? 0) - (scrollView?.contentSize.width ?? 0))
+                    isNeedRefresh = true
+                    tempContentOffset.x = self.refreshHeight
+                    //                    self.scrollView?.setContentOffset(CGPoint(x: self.refreshHeight , y: 0), animated: true )
+                }
+            }else{
+                
+                if contentOffset.x > (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + refreshHeight {//可以刷新
+                    inset.right = self.refreshHeight
+                    isNeedRefresh = true
+                    tempContentOffset.x = (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0) + self.refreshHeight
+                    //                    self.scrollView?.setContentOffset(CGPoint(x: (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0) + self.refreshHeight , y: 0), animated: true )//确保能执行刷新时,才调这句代码 . 否则会出现 偏移后不执行刷新
+                }
+            }
+            break
+        }
+        if isNeedRefresh {
+            // MARK: 注释 a: CollectionView的isPagingEnagle = true , 会影响contentInset的设置,不会发生预设的偏移 , 所以 , 设置contentInset之前, 设置为flase , 当用户拖动时再还原到用户设定的状态
+            UIView.animate(withDuration: 0.25, animations: {
+                self.scrollView?.contentInset = inset
+                self.scrollView?.contentOffset = tempContentOffset
+                
+            }, completion: { (bool ) in
+                
+                self.scrollView?.isPagingEnabled = false
+                self.performRefresh()
+            })
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    func setrefershStatusEndDrag(contentOffset: CGPoint )  {//原计划松手驱动 , for避免重复刷新 , 换成refreshing状态驱动
+        switch self.direction {
+        case  GDDirection.top:
+            if contentOffset.y < -(refreshHeight + originalContentInset.top) {//可以刷新one
+                if self.refreshStatus != GDRefreshStatus.refreshing {
+                    self.refreshStatus = .refreshing
+                    return
+                }
+            }
+            
+            break
+        case  GDDirection.left:
+            if contentOffset.x < -refreshHeight {//可以刷新
+                if self.refreshStatus != GDRefreshStatus.refreshing {
+                    self.refreshStatus = .refreshing
+                    return
+                }
+            }
+            break
+        case  GDDirection.bottom:
+            
+            if (scrollView?.contentSize.height ?? 0) < (scrollView?.bounds.size.height ?? 0){//可滚动区域少于滚动控件frame
+                if contentOffset.y >  refreshHeight { //可以刷新
+                    if self.refreshStatus != GDRefreshStatus.refreshing {
+                        self.refreshStatus = .refreshing
+                        return
+                    }
+                }
+            }else{
+                
+                if contentOffset.y > (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + refreshHeight {//可以刷新
+                    if self.refreshStatus != GDRefreshStatus.refreshing {
+                        self.refreshStatus = .refreshing
+                        return
+                    }
+                }
+            }
+            break
+        case  GDDirection.right:
+            if (scrollView?.contentSize.width ?? 0) < (scrollView?.bounds.size.width ?? 0){
+                if contentOffset.x >  refreshHeight {//可以刷新
+                    if self.refreshStatus != GDRefreshStatus.refreshing {
+                        self.refreshStatus = .refreshing
+                        return
+                    }
+                }
+            }else{
+                
+                if contentOffset.x > (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + refreshHeight {//可以刷新
+                    if self.refreshStatus != GDRefreshStatus.refreshing {
+                        self.refreshStatus = .refreshing
+                        return
+                    }
+                }
+            }
+            break
+        }
+    }
+    
+    public override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        //                mylog(newPoint)//下拉变小
+        //        if let refresh  = self.whetherCallRefreshDelegate(scrollView) {
+        //            refresh.scrollViewDidScroll(scrollView)
+        //        }
+        if self.refreshStatus != GDRefreshStatus.refreshing {
+            self.adjustContentInset(contentOffset: scrollView.contentOffset)
+        }
+    }
+    
+    func adjustContentInset(contentOffset:CGPoint)  {//实时更新图片和显示标签
+        if self.refreshStatus == GDRefreshStatus.refreshing {
+            return
+        }
+        //        mylog(self.frame)
+        mylog(self.scrollView?.contentOffset)
+        mylog(self.direction)
+        var inset  = UIEdgeInsets.zero
+        //        var isNeedRefresh = false
+        switch self.direction {
+        case  GDDirection.top:
+            
+            var scale : CGFloat   = 0
+            
+            if contentOffset.y <=  -originalContentInset.top && contentOffset.y >=  -(refreshHeight + originalContentInset.top)   {
+                
+                scale = (-contentOffset.y - originalContentInset.top)  / refreshHeight
+                mylog(scale)
+                
+            }
+            mylog(originalContentInset)
+            mylog(contentOffset)
+            
+            if contentOffset.y < -(refreshHeight + originalContentInset.top) {//可以刷新
+                inset.top = (refreshHeight + originalContentInset.top)
+                //                    isNeedRefresh = true
+                self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
+            }else{//下拉以刷新
+                if contentOffset.y  >= self.priviousContentOffset.y{//backing
+                    self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing , scale:  scale)
+                }else{//pulling
+                    self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling , scale:  scale)
+                }
+            }
+            
+            break
+        case  GDDirection.left:
+            if contentOffset.x < -refreshHeight {//可以刷新
+                inset.left = self.refreshHeight
+                //                    isNeedRefresh = true
+                self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
+            }else{//右拉以刷新
+                
+                
+                var scale : CGFloat   = 0
+                
+                if contentOffset.x <=  0 && contentOffset.x >=  -refreshHeight   {
+                    
+                    scale = -contentOffset.x  / refreshHeight
+                    mylog(scale)
+                    
+                }
+                
+                //                    self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                if contentOffset.x  >= self.priviousContentOffset.x{//backing
+                    self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing , scale:  scale)
+                    //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
+                    //                        mylog("回去")
+                }else{//pulling
+                    self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling , scale:  scale)
+                }
+            }
+            break
+        case  GDDirection.bottom:
+            
+            if (scrollView?.contentSize.height ?? 0) < (scrollView?.bounds.size.height ?? 0){
+                if contentOffset.y >  refreshHeight { //可以刷新
+                    self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
+                    mylog("松手可刷新")
+                    inset.bottom = self.refreshHeight + ((scrollView?.bounds.size.height ?? 0) - (scrollView?.contentSize.height ?? 0))
+                    //                        isNeedRefresh = true
+                }else{//上拉以刷新
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.y >=  0 && contentOffset.y <=  refreshHeight   {
+                        
+                        scale = contentOffset.y  / refreshHeight
+                        mylog(scale)
+                        
+                    }
+                    
+                    
+                    
+                    if contentOffset.y  <= self.priviousContentOffset.y{//backing
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing , scale: scale)
+                        
+                        
+                    }else{//pulling
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling, scale: scale)
+                        
+                        mylog("上拉以刷新")
+                    }
+                }
+            }else{
+                
+                if contentOffset.y > (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + refreshHeight {//可以刷新
+                    self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
+                    mylog("松手可刷新")
+                    inset.bottom = self.refreshHeight
+                    //                        isNeedRefresh = true
+                }else{//上拉以刷新
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.y <=  (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + refreshHeight && contentOffset.y >=  (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 )   {
+                        
+                        scale = (contentOffset.y - ((scrollView?.contentSize.height ?? 0)  - (scrollView?.bounds.size.height ?? 0 ) ) ) / refreshHeight
+                        mylog(scale)
+                        
+                    }
+                    
+                    if contentOffset.y  <= self.priviousContentOffset.y{//backing
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing, scale: scale)
+                        //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
+                        //                        mylog("回去")
+                    }else{//pulling
+                        mylog("上拉以刷新")
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling, scale: scale)
+                        //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                    }
+                }
+            }
+            break
+        case  GDDirection.right:
+            if (scrollView?.contentSize.width ?? 0) < (scrollView?.bounds.size.width ?? 0){
+                if contentOffset.x >  refreshHeight {//可以刷新
+                    self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
+                    mylog("松手可刷新")
+                    inset.right = self.refreshHeight + ((scrollView?.bounds.size.width ?? 0) - (scrollView?.contentSize.width ?? 0))
+                    //                        isNeedRefresh = true
+                }else{//左拉以刷新
+                    mylog("左拉以刷新")
+                    
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.x >=  0 && contentOffset.x <=  refreshHeight   {
+                        
+                        scale = contentOffset.x  / refreshHeight
+                        mylog(scale)
+                        
+                    }
+                    
+                    
+                    
+                    
+                    if contentOffset.x  <= self.priviousContentOffset.x{//backing
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing , scale : scale )
+                        //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
+                        //                        mylog("回去")
+                    }else{//pulling
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling , scale : scale )
+                        //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                    }
+                }
+            }else{
+                
+                
+                if contentOffset.x > (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + refreshHeight {//可以刷新
+                    self.updateTextAndImage(showStatus: GDShowStatus.prepareRefreshing)
+                    mylog("松手可刷新")
+                    inset.right = self.refreshHeight
+                    //                        isNeedRefresh = true
+                }else{//左拉以刷新
+                    mylog("左拉以刷新")
+                    
+                    
+                    
+                    
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.x <=  (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + refreshHeight && contentOffset.x >=  (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 )   {
+                        
+                        scale = (contentOffset.x - ((scrollView?.contentSize.width ?? 0)  - (scrollView?.bounds.size.width ?? 0 ) ) ) / refreshHeight
+                        mylog(scale)
+                        
+                    }
+                    
+                    
+                    if contentOffset.x  <= self.priviousContentOffset.x{//backing
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.backing , scale : scale )
+                        //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
+                        //                        mylog("回去")
+                    }else{//pulling
+                        self.updateTextAndImage(showStatus: GDShowStatus.pulling , actionType:  GDShowStatus.pulling , scale : scale )
+                        //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                    }
+                }
+            }
+            break
+        }
+        self.priviousContentOffset = contentOffset
+    }
 
 }
 
@@ -389,6 +766,7 @@ extension GDRefreshControl {
 
 
 // MARK: 注释 : KVO
+   /*
 extension GDRefreshControl{
     
 
@@ -771,7 +1149,11 @@ extension GDRefreshControl{
     }
 }
 
-
+*/
+   
+   
+   
+   
 
 public extension UIScrollView{
     static var gdRefreshControl: Void?

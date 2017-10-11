@@ -54,8 +54,8 @@ public class GDBaseControl: UIView {
         self.titleLabel.textAlignment = NSTextAlignment.center
         self.titleLabel.numberOfLines = 0
         self.titleLabel.font = UIFont.systemFont(ofSize: 14)
-        self.titleLabel.textColor = UIColor.init(colorLiteralRed: 180 / 256, green: 180 / 256, blue: 180 / 256, alpha: 1)
-        self.backgroundColor =  UIColor.init(colorLiteralRed: 251 / 256, green: 251 / 256, blue: 251 / 256, alpha: 1)
+        self.titleLabel.textColor = UIColor.init(red: 180 / 256, green: 180 / 256, blue: 180 / 256, alpha: 1)
+        self.backgroundColor =  UIColor.init(red: 251 / 256, green: 251 / 256, blue: 251 / 256, alpha: 1)
         
     }
     
@@ -64,6 +64,10 @@ public class GDBaseControl: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {}
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) { }
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView){ }
+    public func scrollViewContentSizeChanged(){}
     
     
     
@@ -214,10 +218,7 @@ extension GDBaseControl {
 
 // MARK: 注释 : 子类实现
 extension GDBaseControl{
-    public func scrollViewDidScroll(_ scrollView: UIScrollView) {}
-    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) { }
-    public func scrollViewDidEndDragging(_ scrollView: UIScrollView){ }
-    public func scrollViewContentSizeChanged(){}
+    
     
 }
 

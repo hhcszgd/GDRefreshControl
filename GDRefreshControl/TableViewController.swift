@@ -11,14 +11,14 @@ class TableViewController: UITableViewController {
     
     var rows  : Int = 3
     
-    func refresh()  {
+    @objc func refresh()  {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
             
             self.tableView.gdRefreshControl?.endRefresh(result: GDRefreshResult.failure)
         }
     }
     
-    func load(/***/)  {
+    @objc func load(/***/)  {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
  
             if self.rows > 13 {
@@ -37,22 +37,22 @@ class TableViewController: UITableViewController {
 //            self.tableView.gdLoadControl?.endLoad(result: GDLoadResult.success)
 //        }
     }
-    func testProperty() {
-        var count: UInt32 = 3
-        let objc_property_tS = class_copyPropertyList(UIScrollView.self  , &count)
-        for i in 0 ..< count {
-            let objc_property_tO = objc_property_tS![Int(i)]
-            let name = property_getName(objc_property_tO)
-            mylog(String(cString: name!))
-        }
-        free(objc_property_tS)
-    }
+//    func testProperty() {
+//        var count: UInt32 = 3
+//        let objc_property_tS = class_copyPropertyList(UIScrollView.self  , &count)
+//        for i in 0 ..< count {
+//            let objc_property_tO = objc_property_tS![Int(i)]
+//            let name = property_getName(objc_property_tO)
+//            mylog(String(cString: name))
+//        }
+//        free(objc_property_tS)
+//    }
     override func viewDidLoad() {
         super.viewDidLoad()
         print(UIDevice.current.systemVersion)
         self.tableView.rowHeight = UITableViewAutomaticDimension
         self.tableView.estimatedRowHeight = 100
-        self.tableView.contentInset = UIEdgeInsets(top: 88, left: 0, bottom: 0, right: 0    )
+        self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0    )
 //        self.tableView.rowHeight = 99
         let refresh = GDRefreshControl.init(target: self , selector: #selector(self.refresh))
         refresh.direction = GDDirection.bottom

@@ -101,8 +101,8 @@ public class GDLoadControl: GDBaseControl {
     var showStatus = GDLoadShowStatus.idle
     
     
-    fileprivate weak var loadTarget : AnyObject?
-    fileprivate var loadAction : Selector?
+    private weak var loadTarget : AnyObject?
+    private var loadAction : Selector?
     
     public var loadStatus = GDLoadStatus.idle{
         
@@ -187,6 +187,377 @@ public class GDLoadControl: GDBaseControl {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
+    
+    
+    ///:scroll view delegate
+    
+    public override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        
+        // MARK: 注释 a: 当用户拖动时 , 还原滚动控件的isPagingEnable
+        if scrollView.isPagingEnabled != self.originalIspagingEnable {
+            self.scrollView?.isPagingEnabled = self.originalIspagingEnable
+        }
+        
+    }
+    
+    
+    public override  func scrollViewDidEndDragging(_ scrollView: UIScrollView){
+        mylog("松手了  ,当前偏移量是\(scrollView.contentOffset)")
+        
+        if self.loadStatus != GDLoadStatus.loading {
+            self.setrefershStatusEndDrag(contentOffset: scrollView.contentOffset)
+            
+        }
+        
+    }
+    
+    public override func scrollViewContentSizeChanged(){
+        
+        if let scroll = self.scrollView {
+            mylog("监听contentSize : \(String(describing: scroll.contentSize))")
+            self.fixFrame(scrollView: scroll)//自动布局是 , scrollView的contentSize是动态变化的, 所以要实时调整加载控件的frame
+        }
+    }
+    
+    
+    
+    func performLoadAfterSetLoadingStatus(contentOffset: CGPoint )  {//原计划松手驱动 , for避免重复加载 , 换成loading状态驱动
+        var inset  = UIEdgeInsets.zero
+        var isNeedLoad = false
+        
+        
+        //TODO  抽出目标contentOffset 分别赋值 , 再在底部动画与contentInset一起赋值(目前问题 , 达到加载条件后 ,松手会偶尔出现滚动视图乱跳)
+        var tempContentOffset  = CGPoint.zero
+        
+        switch self.direction {
+        case  GDDirection.top:
+            if contentOffset.y < -(loadHeight + originalContentInset.top) {//可以加载
+                inset.top = self.loadHeight + originalContentInset.top
+                isNeedLoad = true
+                //                let contentOffset = CGPoint(x: 0, y: 0)
+                //                self.scrollView?.setContentOffset(contentOffset, animated: true )
+                tempContentOffset.y = -(loadHeight + originalContentInset.top)
+            }
+            
+            break
+        case  GDDirection.left:
+            if contentOffset.x < -loadHeight {//可以加载
+                inset.left = self.loadHeight
+                isNeedLoad = true
+                tempContentOffset.x = -loadHeight
+                //                self.scrollView?.setContentOffset(CGPoint.zero, animated: true )
+            }
+            break
+        case  GDDirection.bottom:
+            
+            if (scrollView?.contentSize.height ?? 0) < (scrollView?.bounds.size.height ?? 0){//可滚动区域少于滚动控件frame
+                if contentOffset.y >  loadHeight { //可以加载
+                    inset.bottom = self.loadHeight + ((scrollView?.bounds.size.height ?? 0) - (scrollView?.contentSize.height ?? 0))
+                    isNeedLoad = true
+                    tempContentOffset.y = loadHeight
+                    
+                }
+            }else{
+                
+                if contentOffset.y > (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + loadHeight {//可以加载
+                    inset.bottom = self.loadHeight
+                    isNeedLoad = true
+                    tempContentOffset.y = (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0) + self.loadHeight
+                }
+            }
+            break
+        case  GDDirection.right:
+            if (scrollView?.contentSize.width ?? 0) < (scrollView?.bounds.size.width ?? 0){
+                if contentOffset.x >  loadHeight {//可以加载
+                    inset.right = self.loadHeight + ((scrollView?.bounds.size.width ?? 0) - (scrollView?.contentSize.width ?? 0))
+                    isNeedLoad = true
+                    tempContentOffset.x = self.loadHeight
+                    //                    self.scrollView?.setContentOffset(CGPoint(x: self.loadHeight , y: 0), animated: true )
+                }
+            }else{
+                
+                if contentOffset.x > (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + loadHeight {//可以加载
+                    inset.right = self.loadHeight
+                    isNeedLoad = true
+                    tempContentOffset.x = (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0) + self.loadHeight
+                }
+            }
+            break
+        }
+        if isNeedLoad {
+            // MARK: 注释 a: CollectionView的isPagingEnagle = true , 会影响contentInset的设置,不会发生预设的偏移 , 所以 , 设置contentInset之前, 设置为flase , 当用户拖动时再还原到用户设定的状态
+            
+            
+            UIView.animate(withDuration: 0.25, animations: {
+                
+                self.scrollView?.contentInset = inset
+                self.scrollView?.contentOffset = tempContentOffset
+            }, completion: { (bool ) in
+                self.scrollView?.isPagingEnabled = false
+                self.performLoad()
+                
+            })
+            
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    func setrefershStatusEndDrag(contentOffset: CGPoint )  {//原计划松手驱动 , for避免重复加载 , 换成loading状态驱动
+        if self.loadStatus == GDLoadStatus.nomore {
+            return
+        }
+        switch self.direction {
+        case  GDDirection.top:
+            if contentOffset.y <  -(loadHeight + originalContentInset.top) {//可以加载
+                if self.loadStatus != GDLoadStatus.loading {
+                    self.loadStatus = .loading
+                    return
+                }
+            }
+            
+            break
+        case  GDDirection.left:
+            if contentOffset.x < -loadHeight {//可以加载
+                if self.loadStatus != GDLoadStatus.loading {
+                    self.loadStatus = .loading
+                    return
+                }
+            }
+            break
+        case  GDDirection.bottom:
+            
+            if (scrollView?.contentSize.height ?? 0) < (scrollView?.bounds.size.height ?? 0){//可滚动区域少于滚动控件frame
+                if contentOffset.y >  loadHeight { //可以加载
+                    if self.loadStatus != GDLoadStatus.loading {
+                        self.loadStatus = .loading
+                        return
+                    }
+                }
+            }else{
+                
+                if contentOffset.y > (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + loadHeight {//可以加载
+                    if self.loadStatus != GDLoadStatus.loading {
+                        self.loadStatus = .loading
+                        return
+                    }
+                }
+            }
+            break
+        case  GDDirection.right:
+            if (scrollView?.contentSize.width ?? 0) < (scrollView?.bounds.size.width ?? 0){
+                if contentOffset.x >  loadHeight {//可以加载
+                    if self.loadStatus != GDLoadStatus.loading {
+                        self.loadStatus = .loading
+                        return
+                    }
+                }
+            }else{
+                
+                if contentOffset.x > (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + loadHeight {//可以加载
+                    if self.loadStatus != GDLoadStatus.loading {
+                        self.loadStatus = .loading
+                        return
+                    }
+                }
+            }
+            break
+        }
+    }
+    
+    public override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        //                mylog(newPoint)//下拉变小
+        
+        if self.loadStatus != GDLoadStatus.loading {
+            self.adjustContentInset(contentOffset: scrollView.contentOffset)
+        }
+    }
+    
+    func adjustContentInset(contentOffset:CGPoint)  {//实时更新图片和显示标签
+        if self.loadStatus == GDLoadStatus.loading || self.loadStatus == GDLoadStatus.nomore {
+            return
+        }
+        //        var inset  = UIEdgeInsets.zero
+        //        mylog(self.frame)
+        //        mylog(self.scrollView?.contentOffset)
+        switch self.direction {
+        case  GDDirection.top:
+            var scale : CGFloat   = 0
+            
+            if contentOffset.y <=  -originalContentInset.top && contentOffset.y >=  -(loadHeight + originalContentInset.top)    {
+                
+                scale = (-contentOffset.y - originalContentInset.top)  / loadHeight
+                mylog(scale)
+                
+            }
+            
+            
+            if contentOffset.y < -(loadHeight + originalContentInset.top) {//可以加载
+                //                inset.top = self.loadHeight
+                self.updateTextAndImage(showStatus: GDLoadShowStatus.prepareLoading)
+            }else{//下拉以加载
+                if contentOffset.y  >= self.priviousContentOffset.y{//backing
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing, scale: scale)
+                }else{//pulling
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale: scale)
+                }
+            }
+            
+            break
+        case  GDDirection.left:
+            if contentOffset.x < -loadHeight {//可以加载
+                //                inset.left = self.loadHeight
+                self.updateTextAndImage(showStatus: GDLoadShowStatus.prepareLoading)
+            }else{//右拉以加载
+                //  self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                
+                
+                var scale : CGFloat   = 0
+                
+                if contentOffset.x <=  0 && contentOffset.x >=  -loadHeight   {
+                    
+                    scale = -contentOffset.x  / loadHeight
+                    mylog(scale)
+                    
+                }
+                
+                
+                
+                if contentOffset.x  >= self.priviousContentOffset.x{//backing
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing , scale:  scale)
+                    //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
+                    //                        mylog("回去")
+                }else{//pulling
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale:  scale)
+                }
+            }
+            break
+        case  GDDirection.bottom:
+            
+            if (scrollView?.contentSize.height ?? 0) < (scrollView?.bounds.size.height ?? 0){
+                if contentOffset.y >  loadHeight { //可以加载
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.prepareLoading)
+                    //                    mylog("松手可加载")
+                    //                    inset.bottom = self.loadHeight + ((scrollView?.bounds.size.height ?? 0) - (scrollView?.contentSize.height ?? 0))
+                }else{//上拉以加载
+                    
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.y >=  0 && contentOffset.y <=  loadHeight   {
+                        
+                        scale = contentOffset.y  / loadHeight
+                        mylog(scale)
+                        
+                    }
+                    
+                    
+                    
+                    if contentOffset.y  <= self.priviousContentOffset.y{//backing
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing , scale : scale )
+                        //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
+                        //                        mylog("回去")
+                    }else{//pulling
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale : scale )
+                        //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                        //                        mylog("上拉以加载")
+                    }
+                }
+            }else{
+                
+                if contentOffset.y > (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + loadHeight {//可以加载
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.prepareLoading)
+                    //                    mylog("松手可加载")
+                    //                    inset.bottom = self.loadHeight
+                }else{//上拉以加载
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.y <=  (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 ) + loadHeight && contentOffset.y >=  (scrollView?.contentSize.height ?? 0) - (scrollView?.bounds.size.height ?? 0 )   {
+                        
+                        scale = (contentOffset.y - ((scrollView?.contentSize.height ?? 0)  - (scrollView?.bounds.size.height ?? 0 ) ) ) / loadHeight
+                        mylog(scale)
+                        
+                    }
+                    
+                    if contentOffset.y  <= self.priviousContentOffset.y{//backing
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing , scale : scale )
+                        //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
+                        //                        mylog("回去")
+                    }else{//pulling
+                        //                        mylog("上拉以加载")
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale : scale )
+                        //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                    }
+                }
+            }
+            break
+        case  GDDirection.right:
+            if (scrollView?.contentSize.width ?? 0) < (scrollView?.bounds.size.width ?? 0){
+                if contentOffset.x >  loadHeight {//可以加载
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.prepareLoading)
+                    //                    mylog("松手可加载")
+                    //                    inset.right = self.loadHeight + ((scrollView?.bounds.size.width ?? 0) - (scrollView?.contentSize.width ?? 0))
+                }else{//左拉以加载
+                    //                    mylog("左拉以加载")
+                    
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.x >=  0 && contentOffset.x <=  loadHeight   {
+                        
+                        scale = contentOffset.x  / loadHeight
+                        mylog(scale)
+                        
+                    }
+                    
+                    
+                    
+                    if contentOffset.x  <= self.priviousContentOffset.x{//backing
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing , scale : scale )
+                        //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
+                        //                        mylog("回去")
+                    }else{//pulling
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale : scale )
+                        //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                    }
+                }
+            }else{
+                if contentOffset.x > (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + loadHeight {//可以加载
+                    self.updateTextAndImage(showStatus: GDLoadShowStatus.prepareLoading)
+                    //                    mylog("松手可加载")
+                    //                    inset.right = self.loadHeight
+                }else{//左拉以加载
+                    //                    mylog("左拉以加载")
+                    
+                    var scale : CGFloat   = 0
+                    
+                    if contentOffset.x <=  (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 ) + loadHeight && contentOffset.x >=  (scrollView?.contentSize.width ?? 0) - (scrollView?.bounds.size.width ?? 0 )   {
+                        
+                        scale = (contentOffset.x - ((scrollView?.contentSize.width ?? 0)  - (scrollView?.bounds.size.width ?? 0 ) ) ) / loadHeight
+                        mylog(scale)
+                        
+                    }
+                    
+                    
+                    
+                    
+                    if contentOffset.x  <= self.priviousContentOffset.x{//backing
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.backing , scale : scale )
+                        //                        self.updateTextAndImage(showStatus: GDShowStatus.backing)
+                        //                        mylog("回去")
+                    }else{//pulling
+                        self.updateTextAndImage(showStatus: GDLoadShowStatus.pulling , actionType:  GDLoadShowStatus.pulling , scale : scale )
+                        //                            self.updateTextAndImage(showStatus: GDShowStatus.pulling)
+                    }
+                }
+            }
+            break
+        }
+        self.priviousContentOffset = contentOffset
+    }
     
     
     
@@ -503,6 +874,8 @@ extension GDLoadControl {
 
 
 // MARK: 注释 : UIScrollViewDelegate
+/*
+ 
 extension GDLoadControl {
     
     
@@ -874,8 +1247,10 @@ extension GDLoadControl {
         }
         self.priviousContentOffset = contentOffset
     }
+    
+    
 }
-
+*/
 
 
 public extension UIScrollView{
