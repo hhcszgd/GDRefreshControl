@@ -4,7 +4,7 @@
 
 ## Getting Started
 推荐使用cocoapods
-pod 'GDRefreshControl', '~> 0.0.87'
+pod 'GDRefreshControl', '~> 0.1.0'
 
 ## Usage
 let refresh = GDRefreshControl.init(target: self , selector: #selector(refreshFunction))
