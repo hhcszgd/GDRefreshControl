@@ -4,7 +4,8 @@
 
 ## Getting Started
 推荐使用cocoapods
-pod 'GDRefreshControl', '~> 0.1.0'
+pod 'GDRefreshControl', '~> 0.1.8'
+0.1.8 对应swift4.0
 
 ## Usage
 let refresh = GDRefreshControl.init(target: self , selector: #selector(refreshFunction))
@@ -17,3 +18,23 @@ refresh.networkErrorImage //网络错误时展示的图片
 refresh.pullingImages //拖拽时的图片集合
 refresh.refreshingImages //刷新时的图片集合
 refresh.pullingStr  // 文字显示
+
+
+```override func viewDidLoad() {
+super.viewDidLoad()
+collectionView?.gdRefreshControl = GDRefreshControl.init(target: self , selector: #selector(performRefresh))
+collectionView?.gdLoadControl = GDLoadControl.init(target: self , selector: #selector(loadMore))
+}
+@objc func loadMore()  {
+DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 3) {
+self.collectionView?.gdLoadControl?.endLoad(result: GDLoadResult.nomore)
+}
+}
+@objc func performRefresh() {
+DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 3) {
+self.collectionView?.gdRefreshControl?.endRefresh(result: GDRefreshResult.networkError)
+}
+}
+```
+
+
