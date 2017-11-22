@@ -36,5 +36,7 @@ self.collectionView?.gdRefreshControl?.endRefresh(result: GDRefreshResult.networ
 }
 }
 ```
-
+## note
+图片取自美团 , 商用请换成自己的图片
+![image](http://ozstzd6mp.bkt.gdipper.com/right.gif)
 
