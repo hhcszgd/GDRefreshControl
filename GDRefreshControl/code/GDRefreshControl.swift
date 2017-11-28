@@ -603,9 +603,14 @@ extension GDRefreshControl {
             }
 
             if result == GDRefreshResult.success {
-                self.scrollView?.contentInset = originalContentInset
-//                self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)//不应该直接设置为0  , 应该记录原始contentInset , 刷新完毕以后重新把contentInset赋值回去
-                self.refreshStatus = GDRefreshStatus.idle
+                UIView.animate(withDuration: 0.25, animations: {
+                    self.scrollView?.contentInset = self.originalContentInset
+                }, completion: { (bool ) in
+                    self.refreshStatus = GDRefreshStatus.idle
+                })
+                //                self.scrollView?.contentInset = originalContentInset
+                //                self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)//不应该直接设置为0  , 应该记录原始contentInset , 刷新完毕以后重新把contentInset赋值回去
+                //                self.refreshStatus = GDRefreshStatus.idle
             }else{
                 UIView.animate(withDuration: 0.2, delay: 0.5, options: UIViewAnimationOptions.curveEaseInOut, animations: {
 //                    self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)

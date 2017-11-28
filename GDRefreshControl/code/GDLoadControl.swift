@@ -608,8 +608,13 @@ extension GDLoadControl {
             
             if result == GDLoadResult.success {
 //                self.scrollView?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
-                self.scrollView?.contentInset = originalContentInset
-                self.loadStatus = GDLoadStatus.idle
+                UIView.animate(withDuration: 0.25, animations: {
+                    self.scrollView?.contentInset = self.originalContentInset
+                }, completion: { (bool ) in
+                    self.loadStatus = GDLoadStatus.idle
+                })
+//                self.scrollView?.contentInset = originalContentInset
+//                self.loadStatus = GDLoadStatus.idle
             }else{
                 UIView.animate(withDuration: 0.2, delay: 0.5, options: UIViewAnimationOptions.curveEaseInOut, animations: {
 //                    mylog(Thread.current )
